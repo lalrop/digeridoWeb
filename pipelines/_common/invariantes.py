@@ -12,8 +12,8 @@ los quince errores de un dataset de una vez, no el primero y nada más.
 
 from __future__ import annotations
 
-from collections.abc import Sequence
-from typing import Any, Mapping
+from collections.abc import Mapping, Sequence
+from typing import Any
 
 # Rangos de códigos de la división político-administrativa chilena.
 # Regiones: 1–16 (15 = Arica y Parinacota, 16 = Ñuble, creada en 2018).
@@ -63,7 +63,9 @@ def sin_duplicados_en(filas: Sequence[Mapping[str, Any]], llaves: Sequence[str])
     for i, fila in enumerate(filas):
         clave = tuple(fila.get(k) for k in llaves)
         if clave in vistos:
-            problemas.append(f"fila {i}: duplica la fila {vistos[clave]} en {list(llaves)}: {clave}")
+            problemas.append(
+                f"fila {i}: duplica la fila {vistos[clave]} en {list(llaves)}: {clave}"
+            )
         else:
             vistos[clave] = i
     return problemas

@@ -18,8 +18,8 @@ import json
 import time
 import urllib.error
 import urllib.request
-from dataclasses import dataclass, asdict
-from datetime import datetime, timezone
+from dataclasses import asdict, dataclass
+from datetime import UTC, datetime
 from pathlib import Path
 
 from .log import log
@@ -86,7 +86,7 @@ def descargar(
                 sha256=sha256_de(destino),
                 bytes=destino.stat().st_size,
                 fecha_descarga=datetime.fromtimestamp(
-                    destino.stat().st_mtime, tz=timezone.utc
+                    destino.stat().st_mtime, tz=UTC
                 ).isoformat(),
                 desde_cache=True,
             )
@@ -126,7 +126,7 @@ def descargar(
         ruta=str(destino),
         sha256=h,
         bytes=destino.stat().st_size,
-        fecha_descarga=datetime.now(tz=timezone.utc).isoformat(),
+        fecha_descarga=datetime.now(tz=UTC).isoformat(),
         desde_cache=False,
     )
 

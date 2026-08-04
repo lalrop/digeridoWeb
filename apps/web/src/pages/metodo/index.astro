@@ -295,9 +295,14 @@ const registro = fuentes.flatMap((f) =>
     white-space: nowrap;
   }
 
+  /* `--color-bilis` da 3.15:1 sobre `--color-papel`: alcanza para "énfasis"
+     (el uso para el que está calibrado, ver color.ts) pero no para texto de
+     9pt, que exige 4.5:1. El aviso se lee en negrita con tinta en vez de
+     depender solo del color. */
   .cambio {
     display: block;
-    color: var(--color-bilis);
+    color: var(--color-tinta);
+    font-weight: var(--peso-bold);
     font-size: var(--tipo-3xs);
   }
 
