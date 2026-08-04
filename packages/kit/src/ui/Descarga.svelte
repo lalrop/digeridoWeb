@@ -16,11 +16,13 @@
     /** Licencia. Por defecto CC BY 4.0, como en el esquema de contenido. */
     licencia?: string;
     /** Bytes. Lo llena el pipeline al publicar; el lector merece saberlo. */
-    bytes?: number;
+    // `| undefined` explícito en las opcionales: se esparcen desde tipos
+    // inferidos por Zod, donde opcional significa `T | undefined`.
+    bytes?: number | undefined;
     /** Filas, si aplica. */
-    filas?: number;
+    filas?: number | undefined;
     /** Descripción de una línea. */
-    descripcion?: string;
+    descripcion?: string | undefined;
   }
 
   let {

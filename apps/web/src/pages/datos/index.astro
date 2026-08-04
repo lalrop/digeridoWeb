@@ -57,9 +57,9 @@ const datasets = despensa(digestiones);
                   nombre={ds.nombre}
                   archivo={ds.archivo}
                   licencia={ds.licencia}
-                  {...(ds.descripcion !== undefined ? { descripcion: ds.descripcion } : {})}
-                  {...(ds.filas !== undefined ? { filas: ds.filas } : {})}
-                  {...(ds.bytes !== undefined ? { bytes: ds.bytes } : {})}
+                  descripcion={ds.descripcion}
+                  filas={ds.filas}
+                  bytes={ds.bytes}
                 />
                 <p class="procedencia utilidad">
                   De <a href={`/digestiones/${ds.digestion.id}/`}>{ds.digestion.titulo}</a>

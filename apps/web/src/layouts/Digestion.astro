@@ -30,11 +30,9 @@ const d = digestion.data;
  * obligatorios en el esquema.
  */
 const original = {
-  ...(d.fuentes[0]?.paginas !== undefined ? { paginas: d.fuentes[0].paginas } : {}),
+  paginas: d.fuentes[0]?.paginas,
   palabras: d.etiqueta?.palabrasOriginal ?? 0,
-  ...(d.etiqueta?.siglasSinDefinir !== undefined
-    ? { siglasSinDefinir: d.etiqueta.siglasSinDefinir }
-    : {}),
+  siglasSinDefinir: d.etiqueta?.siglasSinDefinir,
   legibilidad: d.etiqueta?.legibilidadOriginal ?? 0,
   tiempoLectura: d.tiempoLectura.original,
 };

@@ -25,11 +25,11 @@ export default defineConfig({
       // etiquetas dentro del texto (§2.1).
       optimize: true,
     }),
-    sitemap({
-      // Los borradores no se indexan: `estado` vive en el frontmatter, y
-      // `getStaticPaths` ya los excluye del build de producción.
-      filter: (pagina) => !pagina.includes('/borrador/'),
-    }),
+    // No necesita `filter`: los borradores y las piezas de andamiaje no se
+    // construyen en producción (ver src/lib/digestiones.ts), así que no hay
+    // páginas no indexables que excluir. Filtrar por la URL no funcionaría de
+    // todos modos: `estado` vive en el frontmatter, no en la ruta.
+    sitemap(),
   ],
 
   build: {

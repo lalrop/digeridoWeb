@@ -1,0 +1,50 @@
+# Pipeline de la digestión `ejemplo-partidas`.
+#
+# Los pasos están numerados y son idempotentes: `just todo` se puede correr
+# cuantas veces se quiera. La descarga usa caché, así que repetir no golpea al
+# organismo emisor — cortesía elemental hacia un servicio público.
+#
+# Correr desde la raíz del repo:  just -f pipelines/ejemplo-partidas/justfile todo
+
+raiz := justfile_directory() / "../.."
+py := "python3"
+
+# Lista las recetas disponibles.
+default:
+    @just --list --unsorted -f "{{ justfile() }}"
+
+# Pipeline completo: descargar → extraer → limpiar → validar → publicar.
+todo: descargar extraer limpiar test publicar
+    @echo "pipeline completo. Revisá el meta.json y actualizá el frontmatter."
+
+# 00 — obtiene el documento original y registra su hash.
+descargar *args:
+    cd "{{ raiz }}" && {{ py }} -m pipelines.ejemplo-partidas.00_descargar {{ args }}
+
+# 10 — extrae tablas y mide el documento original para la etiqueta.
+extraer:
+    cd "{{ raiz }}" && {{ py }} -m pipelines.ejemplo-partidas.10_extraer
+
+# 20 — normaliza, redondea y corre las invariantes.
+limpiar:
+    cd "{{ raiz }}" && {{ py }} -m pipelines.ejemplo-partidas.20_limpiar
+
+# 30 — escribe los artefactos en public/data/ y el meta.json.
+publicar:
+    cd "{{ raiz }}" && {{ py }} -m pipelines.ejemplo-partidas.30_publicar
+
+# Tests de invariantes. Bloquean la publicación.
+test:
+    cd "{{ raiz }}" && {{ py }} -m pytest pipelines/ejemplo-partidas/tests -q
+
+# Revalida el hash de la fuente contra el registrado (§13).
+# Pensado para un job semanal: avisa cuando el organismo reemplaza el documento.
+revalidar:
+    cd "{{ raiz }}" && {{ py }} -m pipelines.ejemplo-partidas.00_descargar --forzar
+    @echo "compará el sha256 nuevo contra el de meta.json"
+
+# Borra los intermedios pero NO las descargas crudas: volver a bajar un
+# documento de 400 páginas por limpiar un JSON es un desperdicio.
+limpiar-cache:
+    rm -rf "{{ justfile_directory() }}/interim"
+    @echo "intermedios borrados; raw/ intacto"

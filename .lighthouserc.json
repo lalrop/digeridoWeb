@@ -1,0 +1,136 @@
+{
+  "$comment": [
+    "Presupuesto de rendimiento de §8, la mitad que necesita ejecución real.",
+    "Los pesos de JS los mide scripts/presupuesto-rendimiento.ts sobre dist/;",
+    "acá van LCP y CLS, que solo se pueden medir cargando la página.",
+    "",
+    "El throttling simula 4G: sin eso, un LCP medido en el runner de CI (que",
+    "sirve desde localhost sin latencia) da 200 ms y el presupuesto no",
+    "significa nada.",
+    "Las piezas de andamiaje (ejemplo-*) no se construyen en produccion, asi que no figuran aca. Cuando exista la primera digestion real hay que agregar su URL: es la pagina con isla hidratada, y la unica donde LCP y CLS se ponen a prueba."
+  ],
+  "ci": {
+    "collect": {
+      "staticDistDir": "apps/web/dist",
+      "url": [
+        "http://localhost/index.html",
+        "http://localhost/digestiones/index.html",
+        "http://localhost/metodo/index.html",
+        "http://localhost/datos/index.html"
+      ],
+      "numberOfRuns": 3,
+      "settings": {
+        "preset": "desktop",
+        "throttlingMethod": "simulate",
+        "throttling": {
+          "rttMs": 150,
+          "throughputKbps": 1638.4,
+          "cpuSlowdownMultiplier": 4,
+          "requestLatencyMs": 562.5,
+          "downloadThroughputKbps": 1474.5,
+          "uploadThroughputKbps": 675
+        }
+      }
+    },
+    "assert": {
+      "assertions": {
+        "largest-contentful-paint": [
+          "error",
+          {
+            "maxNumericValue": 2000
+          }
+        ],
+        "cumulative-layout-shift": [
+          "error",
+          {
+            "maxNumericValue": 0.05
+          }
+        ],
+        "total-byte-weight": [
+          "error",
+          {
+            "maxNumericValue": 512000
+          }
+        ],
+        "categories:accessibility": [
+          "error",
+          {
+            "minScore": 1
+          }
+        ],
+        "categories:performance": [
+          "error",
+          {
+            "minScore": 0.95
+          }
+        ],
+        "categories:seo": [
+          "error",
+          {
+            "minScore": 0.95
+          }
+        ],
+        "categories:best-practices": [
+          "warn",
+          {
+            "minScore": 0.95
+          }
+        ],
+        "color-contrast": [
+          "error",
+          {
+            "minScore": 1
+          }
+        ],
+        "html-has-lang": [
+          "error",
+          {
+            "minScore": 1
+          }
+        ],
+        "image-alt": [
+          "error",
+          {
+            "minScore": 1
+          }
+        ],
+        "label": [
+          "error",
+          {
+            "minScore": 1
+          }
+        ],
+        "link-name": [
+          "error",
+          {
+            "minScore": 1
+          }
+        ],
+        "meta-description": [
+          "error",
+          {
+            "minScore": 1
+          }
+        ],
+        "unused-javascript": [
+          "warn",
+          {
+            "maxNumericValue": 20480
+          }
+        ],
+        "unminified-javascript": [
+          "error",
+          {
+            "minScore": 1
+          }
+        ],
+        "$comment-fuentes": "Las fuentes de marca no viajan en el repo, así que en CI estas dos auditorías miden un sitio sin ellas.",
+        "font-display": "off",
+        "preload-fonts": "off"
+      }
+    },
+    "upload": {
+      "target": "temporary-public-storage"
+    }
+  }
+}

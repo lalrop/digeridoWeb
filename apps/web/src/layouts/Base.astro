@@ -14,9 +14,10 @@ interface Props {
   /** `noindex` para borradores y piezas de andamiaje. */
   noIndexar?: boolean;
   tipo?: 'website' | 'article';
-  /** Fechas para metadatos de artículo. */
-  publicado?: Date;
-  modificado?: Date;
+  /** Fechas para metadatos de artículo. `| undefined` explícito: `actualizado`
+   * es opcional en el esquema y llega como `Date | undefined`. */
+  publicado?: Date | undefined;
+  modificado?: Date | undefined;
 }
 
 const {

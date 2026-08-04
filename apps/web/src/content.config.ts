@@ -14,6 +14,8 @@
 import { glob } from 'astro/loaders';
 import { defineCollection, z } from 'astro:content';
 
+import { incluirEjemplos } from './lib/entorno';
+
 /** Temas del portal. Cerrado a propósito: un tema nuevo es una decisión editorial. */
 const TEMAS = [
   'presupuesto', 'economia', 'salud', 'educacion',
@@ -29,7 +31,7 @@ const TEMAS = [
 const fuente = z.object({
   titulo: z.string().min(1),
   organismo: z.string().min(1), // "DIPRES", "Banco Central", "INE"
-  url: z.string().url(),
+  url: z.url(),
   fechaPublicacion: z.coerce.date(),
   fechaDescarga: z.coerce.date(),
   // 64 hex: un placeholder tipo "pendiente" no pasa, que es el punto.
@@ -60,10 +62,25 @@ const dataset = z.object({
   bytes: z.number().int().nonnegative().optional(),
 });
 
+/**
+ * Piezas de andamiaje: su carpeta empieza con `ejemplo-`.
+ *
+ * Se excluyen del LOADER, no solo de `getStaticPaths`. La diferencia importa: si
+ * la entrada sigue en la colección, Astro compila y emite el JS de sus islas
+ * aunque su página no se genere — 15,9 KB de bundle muerto, referenciado por
+ * ningún HTML. Excluirlas acá las saca de raíz.
+ *
+ * Para incluirlas en un build (medir el presupuesto con una isla hidratada):
+ *   DIGERIDO_EJEMPLOS=1 pnpm -F @digerido/web build
+ */
+const PATRON_DIGESTIONES = incluirEjemplos
+  ? '**/index.{md,mdx}'
+  : ['**/index.{md,mdx}', '!ejemplo-*/**'];
+
 const digestiones = defineCollection({
   loader: glob({
     base: './src/content/digestiones',
-    pattern: '**/index.{md,mdx}',
+    pattern: PATRON_DIGESTIONES,
     // El id es la carpeta: "presupuesto-2027/index" → "presupuesto-2027".
     generateId: ({ entry }) => entry.replace(/\/index\.mdx?$/, ''),
   }),
@@ -210,7 +227,7 @@ const fuentesGlobales = defineCollection({
   schema: z.object({
     organismo: z.string(),
     titulo: z.string(),
-    url: z.string().url(),
+    url: z.url(),
     formato: z.enum(['pdf', 'xlsx', 'csv', 'api', 'html']),
     /** Cadena de custodia: cada descarga con su hash y fecha. */
     revisiones: z

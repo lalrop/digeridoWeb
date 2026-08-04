@@ -157,7 +157,33 @@ describe('detectarSiglas', () => {
     expect(r.encontradas[0]).toMatchObject({ sigla: 'SUBDERE', veces: 3 });
     expect(r.total).toBe(2);
   });
+
+  it('no cuenta las palabras de un titular en mayúsculas', () => {
+    // Bug real encontrado corriendo el pipeline: "INFORME DE EJECUCIÓN
+    // PRESUPUESTARIA SINTÉTICO" aportaba 4 siglas sin definir, e inflaba una
+    // cifra destacada de la Etiqueta Nutricional.
+    const r = detectarSiglas('INFORME DE EJECUCIÓN PRESUPUESTARIA SINTÉTICO\n\nLa SUBDERE informó.');
+    const siglas = r.encontradas.map((s) => s.sigla);
+    expect(siglas).toEqual(['SUBDERE']);
+    expect(r.sinDefinir).toBe(1);
+  });
+
+  it('sigue detectando una sigla suelta dentro de una frase', () => {
+    const r = detectarSiglas('La SUBDERE informó al FNDR sobre el PMU.');
+    expect(r.total).toBe(3);
+  });
+
+  it('descarta palabras con tilde: una sigla no lleva tilde', () => {
+    const r = detectarSiglas('La palabra EJECUCIÓN no es una sigla.');
+    expect(r.encontradas.map((s) => s.sigla)).not.toContain('EJECUCIÓN');
+  });
+
+  it('descarta preposiciones en mayúscula', () => {
+    const r = detectarSiglas('GASTO POR REGIÓN Y COMUNA');
+    expect(r.encontradas.map((s) => s.sigla)).not.toContain('POR');
+  });
 });
+
 
 describe('tiempoLectura', () => {
   it('acepta un conteo de palabras directo', () => {

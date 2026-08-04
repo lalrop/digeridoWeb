@@ -7,20 +7,43 @@
     "titulo": "Documento sintético de prueba (no es un documento real)",
     "organismo": "ORGANISMO DE EJEMPLO",
     "url": "https://example.org/documento-sintetico-de-prueba.pdf",
-    "sha256": "1a5d6fd3280cb5b9d21e137d267bd52128713cc14f4be9a9786f061dfbd8d92c",
-    "nota": "El sha256 corresponde al artefacto sintético public/data/ejemplo/partidas.json, que es lo único que existe realmente. No hay documento original que hashear."
+    "sha256": "1a25935210de07f7d4ffa3dbef213f2e4cd40d5d928074d85eb4d09ae9691b83",
+    "bytes": 1301106,
+    "paginas": 412,
+    "fechaDescarga": "2026-08-04",
+    "nota": "El sha256 es del documento sintético generado por 00_descargar.py, que es lo único que existe realmente."
+  },
+  "etiqueta": {
+    "palabrasOriginal": 171605,
+    "siglasSinDefinir": 4,
+    "legibilidadOriginal": 37,
+    "nivelOriginal": "difícil",
+    "tiempoLecturaOriginal": 858,
+    "siglasNoDefinidas": [
+      "FNDR",
+      "PMB",
+      "PMU",
+      "SUBDERE"
+    ]
   },
   "artefactos": [
     {
       "archivo": "ejemplo/partidas.json",
-      "filas": 8,
       "bytes": 1134,
+      "filas": 8,
       "sha256": "1a5d6fd3280cb5b9d21e137d267bd52128713cc14f4be9a9786f061dfbd8d92c"
+    },
+    {
+      "archivo": "ejemplo/partidas.csv",
+      "bytes": 249,
+      "filas": 8,
+      "sha256": "1dfac605daec503f294f6a26f289ac287c36e09f0b86e05ef4abfedefdf5ca5a"
     }
   ],
   "invariantes": {
     "total_cuadra": true,
     "sin_nulos_en_llaves": true,
-    "nota": "En una digestión real estos valores los escribe 30_publicar.py tras correr pytest."
+    "sin_duplicados": true,
+    "nota": "Verificadas en 20_limpiar.py y en tests/test_invariantes.py."
   }
 }

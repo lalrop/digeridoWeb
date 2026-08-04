@@ -1,0 +1,42 @@
+[project]
+name = "digerido-pipelines"
+version = "0.1.0"
+description = "Pipelines de datos de digerido: descargar, extraer, limpiar, validar, publicar."
+requires-python = ">=3.11"
+
+# Fase 0 deliberadamente sin dependencias: los módulos comunes (legibilidad,
+# descarga, invariantes, publicar) usan solo la biblioteca estándar, así que el
+# esqueleto corre en cualquier Python 3.11+ sin instalar nada.
+#
+# Las herramientas pesadas entran cuando la primera digestión real las necesite:
+#   pdfplumber, camelot-py  → extracción de PDF (§7)
+#   polars                  → limpieza de datasets grandes
+#   pyarrow                 → salida Parquet para DuckDB-WASM
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "ruff>=0.6"]
+pdf = ["pdfplumber>=0.11"]
+datos = ["polars>=1.0", "pyarrow>=17.0"]
+
+[tool.pytest.ini_options]
+# `pipelines` se importa como paquete (from pipelines._common import ...), así
+# que la raíz del repo tiene que estar en sys.path.
+pythonpath = ["."]
+testpaths = ["pipelines"]
+python_files = ["test_*.py"]
+addopts = "-q --strict-markers"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+# Los mensajes de log con % son intencionales: logging los formatea de forma
+# perezosa y no paga el costo si el nivel está apagado.
+ignore = ["RUF001", "RUF002", "RUF003"]
+
+[tool.ruff.lint.per-file-ignores]
+# Los scripts numerados no son módulos importables con nombre válido.
+"pipelines/*/[0-9]*.py" = ["N999"]

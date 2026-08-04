@@ -7,10 +7,9 @@
  */
 import { getCollection, type CollectionEntry } from 'astro:content';
 
-export type Digestion = CollectionEntry<'digestiones'>;
+import { incluirEjemplos } from './entorno';
 
-/** En desarrollo se ven borradores; en producción no salen del build. */
-const esProduccion = import.meta.env.PROD;
+export type Digestion = CollectionEntry<'digestiones'>;
 
 /**
  * Lo que un lector puede encontrar navegando: publicadas y archivadas.
@@ -21,7 +20,7 @@ export async function digestionesPublicas(): Promise<Digestion[]> {
   const todas = await getCollection('digestiones', ({ data }) => {
     if (data.estado === 'publicada') return true;
     // Borradores y piezas de ejemplo: visibles solo en desarrollo.
-    return !esProduccion;
+    return incluirEjemplos;
   });
 
   return todas.sort(porFecha);
@@ -40,12 +39,19 @@ export async function digestionesDifundibles(): Promise<Digestion[]> {
 }
 
 /**
- * Todas las rutas a construir. Incluye borradores en desarrollo para poder
- * previsualizar una pieza en curso, y las archivadas siempre.
+ * Todas las rutas a construir.
+ *
+ * En desarrollo se construye todo, para poder previsualizar una pieza en curso.
+ * En producción queda fuera lo que no debería existir en el sitio público:
+ * borradores y piezas de andamiaje con datos sintéticos.
+ *
+ * Que la pieza demo NO se construya en producción es lo que evita la
+ * contradicción de emitir `noindex` en la página y a la vez listarla en el
+ * sitemap — dos señales opuestas al mismo crawler.
  */
 export async function digestionesConRuta(): Promise<Digestion[]> {
   const todas = await getCollection('digestiones', ({ data }) =>
-    esProduccion ? data.estado !== 'borrador' || data.demo : true,
+    incluirEjemplos ? true : data.estado !== 'borrador' && !data.demo,
   );
   return todas.sort(porFecha);
 }

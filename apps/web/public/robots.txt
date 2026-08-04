@@ -1,0 +1,10 @@
+# digerido — todo el sitio es público e indexable.
+#
+# Los borradores y las piezas de andamiaje no llegan a producción: quedan fuera
+# del build (ver src/lib/digestiones.ts), así que no hace falta excluirlos acá.
+# Una regla Disallow para algo que no existe solo confunde.
+
+User-agent: *
+Allow: /
+
+Sitemap: https://digerido.cl/sitemap-index.xml

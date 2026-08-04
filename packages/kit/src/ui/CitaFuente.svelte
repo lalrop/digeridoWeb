@@ -15,7 +15,10 @@
     fechaPublicacion: Date | string;
     fechaDescarga: Date | string;
     sha256: string;
-    paginas?: number;
+    // `| undefined` explícito: estas props se esparcen desde tipos inferidos
+    // por Zod, donde opcional significa `T | undefined`. Sin esto,
+    // exactOptionalPropertyTypes rechaza `{...fuente}`.
+    paginas?: number | undefined;
     formato: 'pdf' | 'xlsx' | 'csv' | 'api' | 'html';
     /** Compacta: para la lista de fuentes al pie del artículo. */
     compacta?: boolean;

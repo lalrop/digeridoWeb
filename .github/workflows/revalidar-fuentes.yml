@@ -1,0 +1,96 @@
+name: revalidar fuentes
+
+# Mitigación de §13: "Job semanal que revalida el hash y avisa por ntfy; los
+# datos publicados nunca dependen de una descarga en vivo."
+#
+# Los organismos reemplazan documentos sin cambiar la URL. Este job lo detecta
+# ANTES de que alguien note que las cifras del artículo ya no cuadran con la
+# fuente. NO regenera ni republica nada: solo avisa.
+on:
+  schedule:
+    # Lunes 12:00 UTC ≈ 08:00/09:00 en Chile continental.
+    - cron: '0 12 * * 1'
+  workflow_dispatch:
+
+jobs:
+  revalidar:
+    name: comparar hashes de las fuentes
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: instalar
+        run: pip install -e .
+
+      - name: revalidar
+        id: revalidar
+        run: python3 scripts/revalidar_fuentes.py --formato github
+        continue-on-error: true
+
+      # ntfy: sin cuentas ni tokens, un POST a un topic. Suficiente para un
+      # proyecto de una persona, y no agrega una dependencia con estado.
+      - name: avisar por ntfy
+        if: steps.revalidar.outputs.cambios != '0'
+        run: |
+          curl -fsS \
+            -H "Title: digerido: ${{ steps.revalidar.outputs.cambios }} fuente(s) cambiaron" \
+            -H "Priority: high" \
+            -H "Tags: warning,page_facing_up" \
+            -d "$(cat cambios.txt)" \
+            "${{ secrets.NTFY_URL }}"
+
+      - name: abrir issue
+        if: steps.revalidar.outputs.cambios != '0'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const cuerpo = fs.readFileSync('cambios.txt', 'utf8');
+            const titulo = 'Fuentes reemplazadas en origen';
+
+            // Reutiliza el issue abierto si ya existe: un issue nuevo por
+            // semana sobre el mismo documento es ruido, no una alerta.
+            const abiertos = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'fuente-cambiada',
+            });
+
+            const texto = [
+              'El chequeo semanal encontró documentos cuyo hash ya no coincide',
+              'con el registrado.',
+              '',
+              '```',
+              cuerpo.trim(),
+              '```',
+              '',
+              'Qué hacer:',
+              '',
+              '1. Descargar la versión nueva y comparar contra la registrada.',
+              '2. Si las cifras de la digestión cambiaron, publicar una corrección',
+              '   con fecha (§13) — no editar en silencio.',
+              '3. Si solo cambió el formato, actualizar el hash en `meta.json`',
+              '   y en `src/content/fuentes/`.',
+            ].join('\n');
+
+            if (abiertos.data.length > 0) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: abiertos.data[0].number,
+                body: texto,
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: titulo,
+                labels: ['fuente-cambiada'],
+                body: texto,
+              });
+            }

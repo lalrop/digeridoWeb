@@ -6,7 +6,7 @@
   "revisiones": [
     {
       "fechaDescarga": "2026-08-01",
-      "sha256": "1a5d6fd3280cb5b9d21e137d267bd52128713cc14f4be9a9786f061dfbd8d92c",
+      "sha256": "1a25935210de07f7d4ffa3dbef213f2e4cd40d5d928074d85eb4d09ae9691b83",
       "cambio": "Entrada de ejemplo: se borra junto con la digestión de andamiaje."
     }
   ]

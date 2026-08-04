@@ -109,8 +109,28 @@ for (const [ruta, peso] of [...pesos.entries()].sort((a, b) => b[1] - a[1])) {
   console.log(`    ${marca}  ${kb(peso).toFixed(1).padStart(7)} KB  ${relative(DIST, ruta)}`);
 }
 
-console.log(`\n  CSS total: ${kb(pesoCss).toFixed(1)} KB · HTML más pesado: ${kb(pesoHtmlMax).toFixed(1)} KB`);
-console.log('  LCP (< 2,0 s en 4G) y CLS (< 0,05) los mide Lighthouse CI.\n');
+console.log(
+  `\n  CSS total: ${kb(pesoCss).toFixed(1)} KB · HTML más pesado: ${kb(pesoHtmlMax).toFixed(1)} KB`,
+);
+
+/**
+ * Sin islas, el presupuesto de JS mide el shell y nada más: pasa siempre, y su
+ * holgura no dice nada sobre lo que costará una digestión real. Vale avisarlo
+ * en vez de reportar tres OK tranquilizadores.
+ *
+ * Ocurre en un build de la Fase 0, donde las piezas de andamiaje quedan fuera
+ * del bundle a propósito. Para medir con una isla hidratada:
+ *   DIGERIDO_EJEMPLOS=1 pnpm -F @digerido/web build && pnpm presupuesto
+ */
+if (!js.some((f) => ES_ISLA.test(f))) {
+  console.log(
+    '\n  AVISO: este build no contiene ninguna isla hidratada, así que el\n' +
+      '  presupuesto de JS solo midió el shell. El techo de 150 KB por digestión\n' +
+      '  recién se pone a prueba cuando exista una pieza real (Fase 1).',
+  );
+}
+
+console.log('\n  LCP (< 2,0 s en 4G) y CLS (< 0,05) los mide Lighthouse CI.\n');
 
 if (excedido) {
   console.error('Presupuesto de §8 excedido. El CI falla acá a propósito.\n');

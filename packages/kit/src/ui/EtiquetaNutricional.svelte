@@ -18,9 +18,11 @@
   import { nivelDeLegibilidad } from '../utils/legibilidad.js';
 
   interface Original {
-    paginas?: number;
+    // `| undefined` explícito: llegan desde el frontmatter, donde opcional
+    // significa `T | undefined`.
+    paginas?: number | undefined;
     palabras: number;
-    siglasSinDefinir?: number;
+    siglasSinDefinir?: number | undefined;
     legibilidad: number;
     /** Minutos. Se formatea a "14 h" solo. */
     tiempoLectura: number;
@@ -30,7 +32,7 @@
     tiempoLectura: number;
     graficos: number;
     legibilidad: number;
-    palabras?: number;
+    palabras?: number | undefined;
   }
 
   interface Props {
