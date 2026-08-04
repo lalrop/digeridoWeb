@@ -1,0 +1,75 @@
+---
+/**
+ * 404. Existe porque la config de Nginx la referencia (`error_page 404`), y sin
+ * este archivo Astro no la genera: Nginx caería a su propia página gris.
+ *
+ * En un sitio cuyo argumento es la trazabilidad, un 404 tiene que ofrecer a
+ * dónde ir, no solo informar el número.
+ */
+import Base from '../layouts/Base.astro';
+---
+
+<Base
+  titulo="Página no encontrada"
+  descripcion="La dirección no existe o la pieza cambió de lugar."
+  noIndexar
+>
+  <div class="contenedor--angosto error">
+    <p class="versalita folio">Error 404</p>
+    <h1>Esta página no existe</h1>
+
+    <p class="bajada">
+      La dirección está mal escrita, o la pieza cambió de lugar. Las dos cosas son culpa
+      nuestra, no tuya.
+    </p>
+
+    <nav aria-label="Dónde seguir">
+      <ul>
+        <li><a href="/digestiones/">Todas las digestiones</a></li>
+        <li><a href="/datos/">La Despensa, con los datos descargables</a></li>
+        <li><a href="/metodo/">Método: cómo trabajamos y cómo corregimos</a></li>
+      </ul>
+    </nav>
+  </div>
+</Base>
+
+<style>
+  .error {
+    padding-block: var(--espacio-4xl) var(--espacio-3xl);
+  }
+
+  .folio {
+    color: var(--color-sello);
+    margin-block-end: var(--espacio-md);
+  }
+
+  h1 {
+    font-size: var(--tipo-3xl);
+  }
+
+  .bajada {
+    margin-block-start: var(--espacio-md);
+    font-size: var(--tipo-lg);
+    line-height: var(--interlinea-corta);
+    color: var(--color-tinta-suave);
+    max-width: var(--medida-angosta);
+  }
+
+  nav {
+    margin-block-start: var(--espacio-2xl);
+    padding-block-start: var(--espacio-md);
+    border-block-start: 1px solid var(--color-borde);
+  }
+
+  ul {
+    display: grid;
+    gap: var(--espacio-sm);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  a {
+    color: var(--color-tinta);
+  }
+</style>
