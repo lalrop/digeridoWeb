@@ -226,17 +226,27 @@ systemctl enable nginx --quiet
 echo
 verde "Listo. https://$DOMINIO"
 echo
+IP_PUBLICA="$(curl -fsS --max-time 5 https://api.ipify.org 2>/dev/null || hostname -I | awk '{print $1}')"
+
 cat <<RESUMEN
-Secrets que hay que cargar en GitHub (Settings → Secrets → Actions):
+Secrets para cargar en GitHub
+(Settings → Secrets and variables → Actions → New repository secret):
 
-  SSH_HOST          $(hostname -I | awk '{print $1}')
-  SSH_USUARIO       $USUARIO_DEPLOY
-  SSH_CLAVE_PRIVADA la clave privada cuyo .pub agregues a
-                    /home/$USUARIO_DEPLOY/.ssh/authorized_keys
-  SSH_HOST_KEY      la salida de:
-                    ssh-keyscan -t ed25519 $DOMINIO
+  SSH_HOST           $IP_PUBLICA
+  SSH_USUARIO        $USUARIO_DEPLOY
+  SSH_CLAVE_PRIVADA  el contenido completo de la clave privada cuya .pub
+                     agregues a /home/$USUARIO_DEPLOY/.ssh/authorized_keys
+                     (incluidas las líneas BEGIN y END)
+  SSH_HOST_KEY       la salida de:  ssh-keyscan -t ed25519 $DOMINIO
 
-Falta:
-  · agregar la clave pública de deploy a authorized_keys
-  · confirmar que astro.config.mjs tenga site: 'https://$DOMINIO'
+Falta todavía:
+  1. agregar la clave pública de despliegue a
+     /home/$USUARIO_DEPLOY/.ssh/authorized_keys
+  2. crear el environment "produccion" en GitHub
+  3. que exista una rama "main": el despliegue se dispara solo con ella
+
+Para comprobar el estado en cualquier momento:
+  sudo $AQUI/verificar-vps.sh $DOMINIO
+
+Paso a paso completo: infra/DESPLIEGUE.md
 RESUMEN

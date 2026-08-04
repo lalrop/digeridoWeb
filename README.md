@@ -186,6 +186,28 @@ Cosas que se descubrieron construyendo esto y conviene saber antes de tropezar:
 
 ---
 
+## Desplegar
+
+Guía completa paso a paso en **[`infra/DESPLIEGUE.md`](infra/DESPLIEGUE.md)**.
+
+```bash
+# en el VPS, una sola vez
+sudo ./infra/instalar-vps.sh digerido.cl deploy
+
+# para diagnosticar cuando algo no funciona
+sudo ./infra/verificar-vps.sh digerido.cl
+```
+
+El instalador detecta la versión de Nginx y los módulos disponibles antes de
+escribir la configuración: tres directivas del vhost dependen de eso, y con la
+variante equivocada Nginx no arranca.
+
+**El despliegue automático se dispara con un push a `main`.** Si esa rama no
+existe, el workflow nunca corre — es lo primero que hay que resolver en un
+repositorio nuevo.
+
+---
+
 ## Licencia
 
 Texto y gráficos bajo [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.es).
