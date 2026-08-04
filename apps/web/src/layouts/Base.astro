@@ -203,6 +203,13 @@ const tituloCompleto = titulo === 'digerido' ? titulo : `${titulo} · digerido`;
       .pie a {
         color: var(--color-tinta);
       }
+
+      /* `.utilidad` (global) usa `--color-sello`, calibrado a 4.56:1 sobre
+         `--color-papel`. El pie usa el fondo más oscuro `--color-papel-bajo`,
+         donde ese mismo gris cae a 4.03:1 y no pasa AA de texto chico. */
+      .pie .utilidad {
+        color: var(--color-tinta-suave);
+      }
     </style>
   </body>
 </html>

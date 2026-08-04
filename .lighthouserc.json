@@ -7,7 +7,9 @@
     "El throttling simula 4G: sin eso, un LCP medido en el runner de CI (que",
     "sirve desde localhost sin latencia) da 200 ms y el presupuesto no",
     "significa nada.",
-    "Las piezas de andamiaje (ejemplo-*) no se construyen en produccion, asi que no figuran aca. Cuando exista la primera digestion real hay que agregar su URL: es la pagina con isla hidratada, y la unica donde LCP y CLS se ponen a prueba."
+    "Las piezas de andamiaje (ejemplo-*) no se construyen en produccion, asi que no figuran aca. Cuando exista la primera digestion real hay que agregar su URL: es la pagina con isla hidratada, y la unica donde LCP y CLS se ponen a prueba.",
+    "",
+    "Las fuentes de marca no viajan en el repo, asi que en CI estas dos auditorias (font-display, preload-fonts) miden un sitio sin ellas: van apagadas."
   ],
   "ci": {
     "collect": {
@@ -124,7 +126,6 @@
             "minScore": 1
           }
         ],
-        "$comment-fuentes": "Las fuentes de marca no viajan en el repo, así que en CI estas dos auditorías miden un sitio sin ellas.",
         "font-display": "off",
         "preload-fonts": "off"
       }
