@@ -1,0 +1,26 @@
+node_modules/
+dist/
+.astro/
+.output/
+.vercel/
+.netlify/
+
+# Artefactos de build de tokens (se generan, no se editan)
+packages/tokens/dist/
+
+# Descargas crudas de los pipelines: pesadas, respaldadas aparte (ver §9)
+pipelines/*/raw/
+pipelines/*/interim/
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# Lighthouse CI
+.lighthouseci/
+
+.DS_Store
+*.log
+.env
+.env.local

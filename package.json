@@ -1,0 +1,26 @@
+{
+  "name": "digerido",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Portal editorial que digiere documentos públicos y los devuelve como historias visuales navegables.",
+  "type": "module",
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @digerido/web dev",
+    "build": "pnpm --filter @digerido/tokens build && pnpm --filter @digerido/web build",
+    "preview": "pnpm --filter @digerido/web preview",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "nueva-digestion": "tsx scripts/nueva-digestion.ts",
+    "presupuesto": "tsx scripts/presupuesto-rendimiento.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.1",
+    "tsx": "4.20.6",
+    "typescript": "5.9.3",
+    "vitest": "4.1.10"
+  }
+}
