@@ -341,13 +341,15 @@ Si pide contraseña, la clave no quedó instalada: repetí 5.3.
 ### 5.5 Sacá la huella del servidor
 
 Sirve para que GitHub verifique que se está conectando al servidor correcto y no
-a un impostor:
+a un impostor. **Ojo:** tiene que ser contra la `<IP>`, no contra el dominio —
+el despliegue se conecta a `$SSH_HOST` (la IP), y `known_hosts` solo sirve si
+la huella quedó guardada bajo ese mismo nombre:
 
 ```bash
-ssh-keyscan -t ed25519 digerido.cl
+ssh-keyscan -t ed25519 <IP>
 ```
 
-**Deberías ver** una línea larga que empieza con `digerido.cl ssh-ed25519 AAAA…`.
+**Deberías ver** una línea larga que empieza con `<IP> ssh-ed25519 AAAA…`.
 Copiala **completa** (ignorá las líneas que empiezan con `#`).
 
 ---
@@ -509,7 +511,7 @@ ssh root@<IP> "cd /opt/digerido && sudo ./infra/verificar-vps.sh digerido.cl"
 | `certbot` falla en el paso 4 | El DNS no propagó todavía | `nslookup digerido.cl` tiene que devolver tu IP. Esperá y volvé a correr el instalador. |
 | `Permission denied (publickey)` al hacer `ssh deploy@` | La clave pública no llegó al servidor | Repetí el paso 5.3 con el método `cat >>`. |
 | El paso «configurar ssh» falla en GitHub | `SSH_CLAVE_PRIVADA` incompleta | Volvé a copiar el archivo entero, con las líneas `BEGIN` y `END`. |
-| `Host key verification failed` | `SSH_HOST_KEY` mal copiada | Volvé a correr `ssh-keyscan` y pegá la línea completa. |
+| `Host key verification failed` | `SSH_HOST_KEY` mal copiada, o sacada contra el dominio en vez de la `<IP>` | Volvé a correr `ssh-keyscan -t ed25519 <IP>` (contra la IP, no `digerido.cl`) y pegá la línea completa. |
 | `rsync: Permission denied` | La carpeta no es del usuario `deploy` | `ssh root@<IP> "chown -R deploy:deploy /var/www/digerido"` |
 | `sudo: a password is required` | Falta el permiso acotado | Volvé a correr el instalador. |
 | `nginx: unknown directive "brotli"` | Se editó la configuración a mano | Volvé a correr el instalador: genera solo lo que el servidor soporta. |
