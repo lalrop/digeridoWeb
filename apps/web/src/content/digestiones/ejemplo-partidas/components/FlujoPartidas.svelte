@@ -34,15 +34,41 @@
   interface Props {
     datos: Partida[];
     unidad: string;
-    /** Paso activo cuando el gráfico se usa dentro de un Scrolly. */
+    /**
+     * Paso activo dentro de un Scrolly.
+     *
+     * Por defecto 1, no 0: fuera del scrollytelling el gráfico se muestra solo
+     * y tiene que sostener su propio título ("Salud concentra un tercio del
+     * aumento"). Con paso 0 todas las barras son contexto y el título afirma
+     * algo que el gráfico no muestra. El Scrolly pasa 0 explícitamente para su
+     * apertura neutra.
+     */
     paso?: number;
   }
 
-  let { datos, unidad, paso = 0 }: Props = $props();
+  let { datos, unidad, paso = 1 }: Props = $props();
 
   const ANCHO = 720;
   const ALTO = 420;
-  const margen = { top: 28, right: 90, bottom: 44, left: 132 };
+
+  /**
+   * El margen izquierdo se calcula desde la etiqueta más larga en vez de fijarse
+   * a ojo: con 132 px, "Trabajo y Previsión" quedaba recortada. Un eje de
+   * categorías se rompe con el primer dataset cuyos nombres son más largos que
+   * los del que se usó para elegir el número.
+   *
+   * 6,4 px por carácter es el ancho medio de IBM Plex Mono a `--tipo-2xs`.
+   */
+  const ANCHO_CARACTER = 6.4;
+  const margen = $derived({
+    top: 28,
+    right: 90,
+    bottom: 44,
+    left: Math.max(
+      64,
+      Math.ceil(Math.max(...datos.map((d) => d.partida.length)) * ANCHO_CARACTER) + 16,
+    ),
+  });
 
   // ── D3 calcula ────────────────────────────────────────────────────────────
   const x = $derived(
@@ -122,7 +148,6 @@
         {margen}
         grilla
         marcas={5}
-        rotulo={unidad}
         formato={(v) => numero(v as number)}
       />
       <Eje escala={y} lado="izquierda" ancho={ANCHO} alto={ALTO} {margen} />

@@ -218,7 +218,6 @@ const componente = `<!--
       alto={ALTO}
       {margen}
       grilla
-      rotulo={unidad}
       formato={(v) => numero(v as number)}
     />
     <Eje escala={y} lado="izquierda" ancho={ANCHO} alto={ALTO} {margen} />
