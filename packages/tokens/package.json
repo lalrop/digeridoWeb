@@ -1,0 +1,22 @@
+{
+  "name": "@digerido/tokens",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Fuente única de color, tipografía y espaciado. Emite CSS custom properties + constantes TS.",
+  "exports": {
+    ".": "./src/index.ts",
+    "./tokens.css": "./dist/tokens.css"
+  },
+  "scripts": {
+    "build": "tsx src/build.ts",
+    "explorar": "tsx src/explorar-paleta.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "devDependencies": {
+    "tsx": "4.20.6",
+    "typescript": "5.9.3",
+    "vitest": "4.1.10"
+  }
+}
