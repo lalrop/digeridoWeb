@@ -1,0 +1,26 @@
+{
+  "_aviso": "Pieza de andamiaje. Todas las cifras son sintéticas y el documento original no existe.",
+  "slug": "ejemplo-partidas",
+  "pipeline": "ejemplo-partidas",
+  "generado": "2026-08-04",
+  "fuente": {
+    "titulo": "Documento sintético de prueba (no es un documento real)",
+    "organismo": "ORGANISMO DE EJEMPLO",
+    "url": "https://example.org/documento-sintetico-de-prueba.pdf",
+    "sha256": "1a5d6fd3280cb5b9d21e137d267bd52128713cc14f4be9a9786f061dfbd8d92c",
+    "nota": "El sha256 corresponde al artefacto sintético public/data/ejemplo/partidas.json, que es lo único que existe realmente. No hay documento original que hashear."
+  },
+  "artefactos": [
+    {
+      "archivo": "ejemplo/partidas.json",
+      "filas": 8,
+      "bytes": 1134,
+      "sha256": "1a5d6fd3280cb5b9d21e137d267bd52128713cc14f4be9a9786f061dfbd8d92c"
+    }
+  ],
+  "invariantes": {
+    "total_cuadra": true,
+    "sin_nulos_en_llaves": true,
+    "nota": "En una digestión real estos valores los escribe 30_publicar.py tras correr pytest."
+  }
+}

@@ -1,0 +1,128 @@
+/**
+ * Grilla del artículo y utilidades de carril (§5).
+ *
+ * Un solo `grid-template-columns` gobierna todos los anchos de contenido; los
+ * componentes eligen CARRIL, no píxeles. Así una figura ancha y otra a sangre
+ * quedan alineadas entre sí y con el texto sin que nadie repita un `max-width`.
+ *
+ *   [ borde ][ ancho ][ texto ][ ancho ][ borde ]
+ */
+@layer layout {
+  .prosa {
+    display: grid;
+    grid-template-columns:
+      minmax(var(--espacio-md), 1fr)
+      minmax(0, calc((56rem - min(66ch, 100%)) / 2))
+      min(66ch, 100% - 2 * var(--espacio-md))
+      minmax(0, calc((56rem - min(66ch, 100%)) / 2))
+      minmax(var(--espacio-md), 1fr);
+  }
+
+  /* Por defecto TODO hijo cae en el carril de texto. Un componente que quiera
+     más ancho lo pide explícitamente; nadie se sale por accidente. */
+  .prosa > * {
+    grid-column: 3;
+  }
+
+  .prosa > .carril-ancho {
+    grid-column: 2 / 5;
+  }
+
+  .prosa > .carril-completo {
+    grid-column: 1 / -1;
+  }
+
+  /* Ritmo vertical: el espaciado va entre bloques, no dentro de ellos, así el
+     margen no colapsa distinto según el orden de los elementos. */
+  .prosa > * + * {
+    margin-block-start: var(--espacio-lg);
+  }
+
+  .prosa > :is(h2, h3) {
+    margin-block-start: var(--espacio-2xl);
+  }
+
+  .prosa > :is(h2, h3) + * {
+    margin-block-start: var(--espacio-md);
+  }
+
+  .prosa > :is(.carril-ancho, .carril-completo) {
+    margin-block: var(--espacio-2xl);
+  }
+
+  /* ── Contenedores de página ───────────────────────────────────────────── */
+  .contenedor {
+    width: min(72rem, 100% - 2 * var(--espacio-lg));
+    margin-inline: auto;
+  }
+
+  .contenedor--angosto {
+    width: min(48rem, 100% - 2 * var(--espacio-lg));
+    margin-inline: auto;
+  }
+
+  /* ── Pila y grilla genéricas ──────────────────────────────────────────── */
+  .pila {
+    display: grid;
+    gap: var(--espacio-md);
+  }
+
+  .pila--lg {
+    gap: var(--espacio-xl);
+  }
+
+  /* `auto-fill` con minmax: las tarjetas se reacomodan sin media queries. */
+  .rejilla {
+    display: grid;
+    gap: var(--espacio-lg);
+    grid-template-columns: repeat(auto-fill, minmax(min(20rem, 100%), 1fr));
+  }
+}
+
+@layer utilities {
+  /* Contenido solo para lectores de pantalla. `clip-path: inset(50%)` en vez de
+     `display: none`, que lo sacaría del árbol de accesibilidad. */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* Visible al recibir foco: el patrón del "saltar al contenido". */
+  .sr-only-focusable:focus-visible {
+    position: fixed;
+    inset-block-start: var(--espacio-md);
+    inset-inline-start: var(--espacio-md);
+    width: auto;
+    height: auto;
+    margin: 0;
+    padding: var(--espacio-xs) var(--espacio-md);
+    clip-path: none;
+    background: var(--color-tinta);
+    color: var(--color-papel);
+    z-index: var(--capa-modal);
+  }
+
+  .utilidad {
+    font-family: var(--fuente-utilidad);
+    font-size: var(--tipo-2xs);
+    color: var(--color-sello);
+  }
+
+  .versalita {
+    font-family: var(--fuente-utilidad);
+    font-size: var(--tipo-3xs);
+    letter-spacing: var(--tracking-versalita);
+    text-transform: uppercase;
+  }
+
+  .medida-angosta {
+    max-width: var(--medida-angosta);
+  }
+}

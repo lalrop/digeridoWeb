@@ -1,0 +1,36 @@
+{
+  "name": "@digerido/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview --host",
+    "typecheck": "astro check",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "7.0.5",
+    "@astrojs/rss": "4.0.19",
+    "@astrojs/sitemap": "3.7.3",
+    "@astrojs/svelte": "9.0.1",
+    "@digerido/kit": "workspace:*",
+    "@digerido/tokens": "workspace:*",
+    "astro": "7.1.6",
+    "d3-array": "3.2.4",
+    "d3-scale": "4.0.2",
+    "d3-shape": "3.2.0",
+    "svelte": "5.56.8"
+  },
+  "devDependencies": {
+    "@resvg/resvg-js": "2.6.2",
+    "@types/d3-array": "3.2.1",
+    "@types/d3-scale": "4.0.9",
+    "@types/d3-shape": "3.1.7",
+    "satori": "0.29.0",
+    "typescript": "5.9.3",
+    "vitest": "4.1.10",
+    "@astrojs/check": "0.9.10"
+  }
+}

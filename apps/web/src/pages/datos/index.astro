@@ -1,0 +1,134 @@
+---
+/**
+ * /datos/ — la Despensa: todos los datos procesados, descargables.
+ *
+ * Se arma desde el frontmatter de las digestiones, no desde una lista aparte:
+ * un dataset existe acá porque una pieza lo declaró, y su licencia viene del
+ * mismo lugar. Así no hay forma de que la Despensa y los artículos discrepen.
+ */
+import Descarga from '@digerido/kit/ui/Descarga.svelte';
+import { formatoFecha } from '@digerido/kit/utils';
+
+import Base from '../../layouts/Base.astro';
+import { despensa, digestionesPublicas } from '../../lib/digestiones';
+
+const digestiones = await digestionesPublicas();
+const datasets = despensa(digestiones);
+---
+
+<Base
+  titulo="Despensa"
+  descripcion="Los datos procesados de cada digestión, en CSV y JSON, con licencia y trazabilidad al documento original."
+>
+  <div class="contenedor--angosto despensa">
+    <h1>Despensa</h1>
+    <p class="bajada">
+      Los datos ya limpios de cada digestión, descargables. Sirven para repetir el análisis, para
+      refutarlo o para hacer otra cosa con ellos.
+    </p>
+
+    <section class="condiciones">
+      <h2 class="versalita">Cómo usarlos</h2>
+      <ul>
+        <li>Cada archivo declara su licencia. Por defecto, CC BY 4.0: citá la fuente.</li>
+        <li>
+          Los redondeos ya están aplicados: las cifras vienen como se publicaron, no con catorce
+          decimales.
+        </li>
+        <li>
+          El documento original de cada dataset está enlazado en su digestión, con hash y fecha de
+          descarga.
+        </li>
+        <li>
+          Si un dato te parece equivocado, probablemente convenga revisarlo — avisá antes de
+          construir algo encima.
+        </li>
+      </ul>
+    </section>
+
+    {
+      datasets.length > 0 ? (
+        <section>
+          <h2>Datasets</h2>
+          <div class="pila">
+            {datasets.map((ds) => (
+              <div class="entrada">
+                <Descarga
+                  nombre={ds.nombre}
+                  archivo={ds.archivo}
+                  licencia={ds.licencia}
+                  {...(ds.descripcion !== undefined ? { descripcion: ds.descripcion } : {})}
+                  {...(ds.filas !== undefined ? { filas: ds.filas } : {})}
+                  {...(ds.bytes !== undefined ? { bytes: ds.bytes } : {})}
+                />
+                <p class="procedencia utilidad">
+                  De <a href={`/digestiones/${ds.digestion.id}/`}>{ds.digestion.titulo}</a>
+                  <span aria-hidden="true"> · </span>
+                  {ds.organismo}
+                  <span aria-hidden="true"> · </span>
+                  {formatoFecha(ds.fecha)}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : (
+        <section>
+          <p class="utilidad">
+            Todavía no hay datasets publicados. Aparecen acá automáticamente cuando una digestión
+            los declara.
+          </p>
+        </section>
+      )
+    }
+  </div>
+</Base>
+
+<style>
+  .despensa {
+    padding-block: var(--espacio-3xl) var(--espacio-2xl);
+  }
+
+  .bajada {
+    margin-block-start: var(--espacio-md);
+    font-size: var(--tipo-lg);
+    line-height: var(--interlinea-corta);
+    color: var(--color-tinta-suave);
+  }
+
+  section {
+    margin-block-start: var(--espacio-2xl);
+  }
+
+  h2 {
+    font-size: var(--tipo-xl);
+    margin-block-end: var(--espacio-md);
+  }
+
+  .condiciones h2 {
+    font-size: var(--tipo-3xs);
+    color: var(--color-sello);
+    padding-block-end: var(--espacio-xs);
+    border-block-end: 1px solid var(--color-borde);
+  }
+
+  .condiciones ul {
+    display: grid;
+    gap: var(--espacio-xs);
+    padding-inline-start: var(--espacio-lg);
+    font-size: var(--tipo-sm);
+  }
+
+  .entrada {
+    display: grid;
+    gap: var(--espacio-2xs);
+  }
+
+  .procedencia {
+    padding-inline-start: var(--espacio-md);
+  }
+
+  .procedencia a {
+    color: var(--color-tinta);
+  }
+</style>

@@ -1,0 +1,207 @@
+---
+/**
+ * Shell HTML común. Todo lo que toca el `<head>` vive acá y en ningún otro
+ * lugar: es la única forma de que el presupuesto de §8 sea auditable.
+ */
+import '../styles/base.css';
+import '../styles/layout.css';
+
+interface Props {
+  titulo: string;
+  descripcion: string;
+  /** Ruta absoluta de la imagen OG. Por defecto, la del sitio. */
+  imagenOG?: string;
+  /** `noindex` para borradores y piezas de andamiaje. */
+  noIndexar?: boolean;
+  tipo?: 'website' | 'article';
+  /** Fechas para metadatos de artículo. */
+  publicado?: Date;
+  modificado?: Date;
+}
+
+const {
+  titulo, descripcion, imagenOG = '/og/portal.png',
+  noIndexar = false, tipo = 'website', publicado, modificado,
+} = Astro.props;
+
+const canonica = new URL(Astro.url.pathname, Astro.site);
+const og = new URL(imagenOG, Astro.site);
+const tituloCompleto = titulo === 'digerido' ? titulo : `${titulo} · digerido`;
+---
+
+<!doctype html>
+<html lang="es-CL">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>{tituloCompleto}</title>
+    <meta name="description" content={descripcion} />
+    <link rel="canonical" href={canonica} />
+
+    {noIndexar && <meta name="robots" content="noindex, nofollow" />}
+
+    {/*
+      Fuentes autoalojadas (§5): subsetting a latin-ext, font-display: swap.
+      Solo se PRECARGA la display, que aparece sobre el pliegue en toda página.
+      Precargar las tres compite con el LCP en vez de ayudarlo.
+
+      Los archivos van en public/fuentes/ y no están en el repo: se agregan al
+      instalar el proyecto (ver README). El @font-face con `swap` hace que la
+      página sea legible con la fuente de sistema mientras cargan.
+    */}
+    <link
+      rel="preload"
+      href="/fuentes/archivo-expanded-var.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+
+    <meta property="og:type" content={tipo} />
+    <meta property="og:title" content={titulo} />
+    <meta property="og:description" content={descripcion} />
+    <meta property="og:url" content={canonica} />
+    <meta property="og:image" content={og} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="es_CL" />
+    <meta property="og:site_name" content="digerido" />
+
+    {/* La OG image reproduce la Etiqueta Nutricional: `summary_large_image`
+        es la única tarjeta donde se lee (§8). */}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={titulo} />
+    <meta name="twitter:description" content={descripcion} />
+    <meta name="twitter:image" content={og} />
+
+    {publicado && <meta property="article:published_time" content={publicado.toISOString()} />}
+    {modificado && <meta property="article:modified_time" content={modificado.toISOString()} />}
+
+    <link rel="alternate" type="application/rss+xml" title="digerido" href="/rss.xml" />
+
+    {/*
+      Analítica: Umami autoalojado, sin cookies y sin banner (§9). El script se
+      deja comentado hasta que exista la instancia; `defer` para no competir
+      con el LCP.
+
+      <script defer src="https://umami.tu-vps.cl/script.js"
+              data-website-id="PENDIENTE"></script>
+    */}
+  </head>
+
+  <body>
+    {/* Primer elemento enfocable: requisito de navegación por teclado (§8). */}
+    <a class="sr-only sr-only-focusable" href="#contenido">Saltar al contenido</a>
+
+    <header class="cabecera">
+      <div class="contenedor cabecera__interior">
+        <a class="marca" href="/">
+          digerido
+          <span class="marca__glosa">documentos públicos, digeribles</span>
+        </a>
+
+        <nav aria-label="Principal">
+          <ul>
+            <li><a href="/digestiones/">Digestiones</a></li>
+            <li><a href="/datos/">Despensa</a></li>
+            <li><a href="/metodo/">Método</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main id="contenido">
+      <slot />
+    </main>
+
+    <footer class="pie">
+      <div class="contenedor pie__interior">
+        <p class="utilidad">
+          <strong>digerido</strong> — Publicación independiente. Todo el contenido bajo
+          <a href="https://creativecommons.org/licenses/by/4.0/deed.es" rel="license">CC BY 4.0</a>,
+          salvo indicación contraria.
+        </p>
+        <p class="utilidad">
+          Las fuentes originales pertenecen a sus organismos emisores y se citan con URL,
+          fecha de descarga y hash. <a href="/metodo/">Cómo trabajamos</a>.
+        </p>
+      </div>
+    </footer>
+
+    <style>
+      .cabecera {
+        border-block-end: 1px solid var(--color-borde);
+        background: var(--color-papel);
+      }
+
+      .cabecera__interior {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--espacio-md);
+        align-items: baseline;
+        justify-content: space-between;
+        padding-block: var(--espacio-md);
+      }
+
+      .marca {
+        font-family: var(--fuente-display);
+        font-size: var(--tipo-lg);
+        font-weight: var(--peso-bold);
+        letter-spacing: var(--tracking-ajustado);
+        text-decoration: none;
+        display: grid;
+        gap: 0.1em;
+      }
+
+      .marca__glosa {
+        font-family: var(--fuente-utilidad);
+        font-size: var(--tipo-3xs);
+        font-weight: var(--peso-regular);
+        letter-spacing: var(--tracking-versalita);
+        text-transform: uppercase;
+        color: var(--color-sello);
+      }
+
+      nav ul {
+        display: flex;
+        gap: var(--espacio-lg);
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      nav a {
+        font-family: var(--fuente-utilidad);
+        font-size: var(--tipo-2xs);
+        letter-spacing: var(--tracking-amplio);
+        text-decoration: none;
+        color: var(--color-tinta-suave);
+        padding-block: var(--espacio-2xs);
+        border-block-end: 2px solid transparent;
+      }
+
+      nav a:hover {
+        color: var(--color-tinta);
+        border-block-end-color: var(--color-enzima);
+      }
+
+      .pie {
+        margin-block-start: var(--espacio-4xl);
+        border-block-start: 1px solid var(--color-borde);
+        background: var(--color-papel-bajo);
+      }
+
+      .pie__interior {
+        display: grid;
+        gap: var(--espacio-xs);
+        padding-block: var(--espacio-xl);
+        max-width: var(--medida-ancha);
+      }
+
+      .pie a {
+        color: var(--color-tinta);
+      }
+    </style>
+  </body>
+</html>

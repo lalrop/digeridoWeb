@@ -1,0 +1,161 @@
+---
+/**
+ * Home. Declara la tesis y muestra la digestión destacada.
+ *
+ * Deliberadamente NO es un dashboard ni una grilla de tarjetas infinita: §2 dice
+ * que esto es una publicación. La home de una publicación tiene una pieza
+ * arriba, no doce iguales.
+ */
+import TarjetaDigestion from '../components/TarjetaDigestion.astro';
+import Base from '../layouts/Base.astro';
+import { destacada, digestionesPublicas } from '../lib/digestiones';
+
+const digestiones = await digestionesPublicas();
+const principal = destacada(digestiones);
+const resto = digestiones.filter((d) => d.id !== principal?.id);
+---
+
+<Base
+  titulo="digerido"
+  descripcion="Documentos públicos ilegibles, convertidos en historias visuales navegables. El problema del dato público en Chile no es la disponibilidad: es la digestibilidad."
+>
+  <section class="tesis">
+    <div class="contenedor">
+      <h1>
+        Chile publica <em>todo</em>.<br />
+        Nadie puede leerlo.
+      </h1>
+
+      <div class="tesis__texto">
+        <p>
+          PDFs de 400 páginas. Planillas sin diccionario de variables. Informes escritos en jerga
+          administrativa. La información pública chilena es técnicamente accesible y prácticamente
+          inutilizable.
+        </p>
+        <p>
+          El problema no es la disponibilidad. Es la <strong>digestibilidad</strong>.
+        </p>
+        <p class="tesis__cierre">
+          <strong>digerido</strong> toma un documento público a la vez y responde una sola pregunta:
+          <em>¿qué dice realmente y por qué debería importarme?</em>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  {
+    principal && (
+      <section class="destacada">
+        <div class="contenedor">
+          <h2 class="versalita rotulo">Última digestión</h2>
+          <TarjetaDigestion digestion={principal} destacada />
+        </div>
+      </section>
+    )
+  }
+
+  {
+    resto.length > 0 && (
+      <section class="resto">
+        <div class="contenedor">
+          <h2 class="versalita rotulo">Anteriores</h2>
+          <div class="rejilla">
+            {resto.map((d) => (
+              <TarjetaDigestion digestion={d} />
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    digestiones.length === 0 && (
+      <section class="vacio">
+        <div class="contenedor--angosto">
+          <p class="utilidad">
+            Todavía no hay digestiones publicadas. La Fase 1 del proyecto produce una sola pieza,
+            terminada y compartible sin disculpas — antes que seis a medias.
+          </p>
+        </div>
+      </section>
+    )
+  }
+
+  <section class="franja-metodo">
+    <div class="contenedor--angosto">
+      <h2>Cada cifra tiene su documento</h2>
+      <p>
+        Toda digestión declara su fuente con URL, fecha de descarga y hash SHA-256. Los datos
+        procesados se publican en la <a href="/datos/">Despensa</a> con licencia. El proceso, los
+        sesgos y las correcciones están en <a href="/metodo/">Método</a>.
+      </p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .tesis {
+    padding-block: var(--espacio-4xl) var(--espacio-3xl);
+  }
+
+  h1 {
+    font-size: var(--tipo-4xl);
+    max-width: 20ch;
+  }
+
+  /* La cursiva de Archivo Expanded en "todo": el énfasis del titular no
+     necesita otro color, solo otro eje tipográfico. */
+  h1 em {
+    font-style: normal;
+    color: var(--color-bilis);
+  }
+
+  .tesis__texto {
+    margin-block-start: var(--espacio-xl);
+    max-width: var(--medida-texto);
+    display: grid;
+    gap: var(--espacio-md);
+  }
+
+  .tesis__cierre {
+    margin-block-start: var(--espacio-sm);
+    padding-block-start: var(--espacio-md);
+    border-block-start: 1px solid var(--color-borde);
+    font-size: var(--tipo-lg);
+    line-height: var(--interlinea-corta);
+  }
+
+  .tesis__cierre em {
+    font-style: italic;
+  }
+
+  .rotulo {
+    color: var(--color-sello);
+    margin-block-end: var(--espacio-md);
+    padding-block-end: var(--espacio-xs);
+    border-block-end: 1px solid var(--color-borde);
+  }
+
+  .destacada,
+  .resto,
+  .vacio {
+    padding-block: var(--espacio-2xl);
+  }
+
+  .franja-metodo {
+    margin-block-start: var(--espacio-2xl);
+    padding-block: var(--espacio-2xl);
+    background: var(--color-papel-bajo);
+    border-block: 1px solid var(--color-borde);
+  }
+
+  .franja-metodo h2 {
+    font-size: var(--tipo-xl);
+    margin-block-end: var(--espacio-sm);
+  }
+
+  .franja-metodo p {
+    max-width: var(--medida-texto);
+  }
+</style>

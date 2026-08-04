@@ -1,0 +1,25 @@
+---
+/**
+ * Página de una digestión. El MDX aporta el cuerpo; `Digestion.astro` la
+ * apertura y el cierre obligatorios.
+ */
+import { render } from 'astro:content';
+
+import Digestion from '../../layouts/Digestion.astro';
+import { digestionesConRuta } from '../../lib/digestiones';
+
+export async function getStaticPaths() {
+  const digestiones = await digestionesConRuta();
+  return digestiones.map((digestion) => ({
+    params: { slug: digestion.id },
+    props: { digestion },
+  }));
+}
+
+const { digestion } = Astro.props;
+const { Content } = await render(digestion);
+---
+
+<Digestion {digestion}>
+  <Content />
+</Digestion>

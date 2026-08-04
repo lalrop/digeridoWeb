@@ -1,0 +1,92 @@
+---
+/**
+ * Índice de digestiones. Los filtros por tema llegan en la Fase 3 (Pagefind +
+ * filtrado estático); por ahora el conteo por tema ya se calcula y se muestra,
+ * porque es información útil aunque todavía no sea navegable.
+ */
+import TarjetaDigestion from '../../components/TarjetaDigestion.astro';
+import Base from '../../layouts/Base.astro';
+import { digestionesPublicas, temasConConteo } from '../../lib/digestiones';
+
+const digestiones = await digestionesPublicas();
+const temas = temasConConteo(digestiones);
+---
+
+<Base
+  titulo="Digestiones"
+  descripcion="Todas las digestiones publicadas: documentos públicos convertidos en historias visuales navegables."
+>
+  <div class="contenedor cabeza">
+    <h1>Digestiones</h1>
+    <p class="bajada">
+      Cada pieza toma un documento público y responde qué dice y por qué importa. Una a la vez.
+    </p>
+
+    {
+      temas.length > 0 && (
+        <ul class="temas utilidad" aria-label="Temas cubiertos">
+          {temas.map(({ tema, total }) => (
+            <li>
+              {tema} <span class="conteo">{total}</span>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+  </div>
+
+  <div class="contenedor listado">
+    {
+      digestiones.length > 0 ? (
+        <div class="rejilla">
+          {digestiones.map((d) => (
+            <TarjetaDigestion digestion={d} />
+          ))}
+        </div>
+      ) : (
+        <p class="utilidad">Todavía no hay digestiones publicadas.</p>
+      )
+    }
+  </div>
+</Base>
+
+<style>
+  .cabeza {
+    padding-block: var(--espacio-3xl) var(--espacio-xl);
+    border-block-end: 1px solid var(--color-borde);
+  }
+
+  .bajada {
+    margin-block-start: var(--espacio-md);
+    font-size: var(--tipo-lg);
+    line-height: var(--interlinea-corta);
+    color: var(--color-tinta-suave);
+    max-width: var(--medida-angosta);
+  }
+
+  .temas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--espacio-xs);
+    list-style: none;
+    padding: 0;
+    margin-block-start: var(--espacio-lg);
+  }
+
+  .temas li {
+    display: flex;
+    gap: var(--espacio-2xs);
+    align-items: baseline;
+    border: 1px solid var(--color-borde);
+    padding: var(--espacio-3xs) var(--espacio-xs);
+  }
+
+  .conteo {
+    color: var(--color-tinta);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .listado {
+    padding-block: var(--espacio-2xl);
+  }
+</style>

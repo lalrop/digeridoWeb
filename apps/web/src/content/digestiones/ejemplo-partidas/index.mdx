@@ -1,0 +1,114 @@
+---
+titulo: 'Cómo se lee una partida presupuestaria'
+bajada: 'Pieza de andamiaje con cifras inventadas. Existe para verificar que el sistema de diseño, el scrollytelling y el pipeline funcionan de punta a punta antes de digerir un documento real.'
+hallazgo: 'En este ejemplo sintético, una sola partida concentra un tercio del aumento total.'
+fecha: 2026-08-04
+autores: ['digerido']
+temas: ['presupuesto']
+dificultadOriginal: 3
+tiempoLectura:
+  original: 840
+  digerido: 6
+etiqueta:
+  palabrasOriginal: 186430
+  siglasSinDefinir: 94
+  legibilidadOriginal: 22
+  legibilidadDigerido: 68
+  graficos: 1
+fuentes:
+  - titulo: 'Documento sintético de prueba (no es un documento real)'
+    organismo: 'ORGANISMO DE EJEMPLO'
+    url: 'https://example.org/documento-sintetico-de-prueba.pdf'
+    fechaPublicacion: 2026-07-15
+    fechaDescarga: 2026-08-01
+    sha256: '1a5d6fd3280cb5b9d21e137d267bd52128713cc14f4be9a9786f061dfbd8d92c'
+    paginas: 412
+    formato: 'pdf'
+datasets:
+  - nombre: 'Partidas de ejemplo'
+    archivo: 'ejemplo/partidas.json'
+    licencia: 'CC BY 4.0'
+    descripcion: 'Ocho partidas sintéticas con monto y variación anual. Datos inventados.'
+    filas: 8
+    bytes: 1134
+destacada: false
+estado: 'borrador'
+demo: true
+limitaciones:
+  - 'Todas las cifras son sintéticas: se generaron con una fórmula, no se extrajeron de ningún documento. No describen el presupuesto de Chile ni de ningún otro país.'
+  - 'El "documento original" no existe. Las páginas, palabras y siglas de la etiqueta nutricional son valores de prueba para verificar el formateo.'
+  - 'Esta pieza no puede pasar a estado "publicada": el esquema de contenido lo rechaza mientras tenga `demo: true`.'
+---
+
+import FlujoPartidas from './components/FlujoPartidas.svelte';
+import FlujoScrolly from './components/FlujoScrolly.svelte';
+import datos from '../../../../public/data/ejemplo/partidas.json';
+
+## Para qué sirve esta página
+
+Esta no es una digestión. Es el andamio: la pieza que confirma que el esqueleto
+del sitio funciona antes de gastar semanas en un documento real. Verifica cinco
+cosas que conviene tener resueltas antes y no después:
+
+1. Que el esquema de contenido rechaza lo que debe rechazar.
+2. Que el gráfico principal sigue el patrón canónico y es accesible.
+3. Que el scrollytelling degrada bien cuando el lector pide menos movimiento.
+4. Que la Etiqueta Nutricional se arma desde las métricas del pipeline.
+5. Que el presupuesto de rendimiento se cumple con una isla hidratada.
+
+Las cifras de acá abajo son inventadas. La estructura no.
+
+## El gráfico principal
+
+El patrón obligatorio es **D3 calcula, Svelte renderiza**: se importan solo
+`d3-scale` y `d3-array`, nunca `d3` completo, y nunca se llama a `.append()`.
+Svelte es dueño del DOM; D3 aporta las escalas.
+
+<div class="carril-ancho">
+  <FlujoPartidas datos={datos.partidas} unidad={datos.unidad} client:visible />
+</div>
+
+Probá tres cosas en ese gráfico: pasá el cursor por una barra, recorrelas con
+<kbd>Tab</kbd>, y abrí «Ver datos». El tooltip responde igual al foco que al
+mouse, y la tabla sale de los mismos datos que las barras — no hay forma de que
+queden desincronizadas.
+
+## La misma figura, guiada
+
+El scrollytelling usa el componente compartido del kit, con un máximo de seis
+pasos. El gráfico se entiende detenido en cualquier paso: el texto anota, no
+explica lo obvio.
+
+<div class="carril-completo">
+  <FlujoScrolly datos={datos.partidas} unidad={datos.unidad} client:visible />
+</div>
+
+Un detalle del stack que conviene saber desde el día uno: **la secuencia de pasos
+no se escribe en el MDX**. MDX es JSX, y la sintaxis de snippets de Svelte no es
+válida ahí, así que cada scrollytelling vive en un `.svelte` propio de la pieza
+—acá, `components/FlujoScrolly.svelte`— y el artículo lo invoca con una sola
+etiqueta. El kit aporta el mecanismo; el guión de los pasos viaja con el
+artículo.
+
+## Qué comprobar a mano
+
+Antes de dar el esqueleto por bueno, conviene verificar lo que ninguna prueba
+automática alcanza:
+
+- **Activá «reducir movimiento»** en el sistema operativo y recargá. El
+  scrollytelling debe convertirse en gráficos apilados legibles, nunca en una
+  pantalla en blanco.
+- **Desactivá JavaScript.** El texto, el gráfico y las tablas siguen ahí: las
+  islas se renderizan en build.
+- **Abrilo en un teléfono de verdad**, no en el emulador. El gráfico sticky
+  ocupa el 55 % superior de la pantalla, no el 100 %.
+- **Recorré la página entera con el teclado.** Todo control tiene foco visible.
+
+## Y después
+
+Con esto verde, el paso siguiente es la Fase 1: una digestión terminada, de
+calidad publicable, sobre un documento de dificultad media con datos limpios.
+El plan sugiere Mercado Público o el Congreso — los dos tienen API, así que se
+puede construir la primera pieza sin pelear con extracción de PDF.
+
+Esta página se borra cuando esa exista.

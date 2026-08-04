@@ -1,0 +1,309 @@
+---
+/**
+ * /metodo/ — proceso, sesgos, correcciones y política editorial.
+ *
+ * §12 lo pide explícitamente: "Escribirlo en /metodo/ antes de publicar la
+ * primera pieza vale más que explicarlo después." Por eso esta página existe en
+ * la Fase 0, antes de que haya una sola digestión publicada.
+ */
+import { getCollection } from 'astro:content';
+
+import { fechaISO, formatoFecha, hashCorto } from '@digerido/kit/utils';
+
+import Base from '../../layouts/Base.astro';
+
+const fuentes = await getCollection('fuentes');
+const registro = fuentes.flatMap((f) =>
+  f.data.revisiones.map((r) => ({ ...r, organismo: f.data.organismo, titulo: f.data.titulo, url: f.data.url })),
+).sort((a, b) => b.fechaDescarga.getTime() - a.fechaDescarga.getTime());
+---
+
+<Base
+  titulo="Método"
+  descripcion="Cómo digerido elige documentos, extrae datos, verifica cifras y corrige errores. Incluye la política de conflicto de interés y el registro de fuentes."
+>
+  <div class="contenedor--angosto metodo">
+    <h1>Método</h1>
+    <p class="bajada">
+      Una publicación que afirma cosas sobre documentos públicos tiene que ser auditable. Acá está
+      cómo se hace y dónde puede fallar.
+    </p>
+
+    <section>
+      <h2>Qué es una digestión</h2>
+      <p>
+        Una digestión es un artículo sobre <strong>un</strong> documento o dataset público. Tiene un
+        ángulo, un hallazgo y un cierre. Si el contenido no puede resumirse en una frase que le
+        importe a alguien, no se publica.
+      </p>
+      <p>
+        Lo que <em>no</em> es: un dashboard, un repositorio de datos, ni una invitación a que el
+        lector explore por su cuenta y saque sus propias conclusiones. La pregunta que responde una
+        digestión es <em>«¿qué dice realmente este documento y por qué debería importarme?»</em>
+      </p>
+    </section>
+
+    <section>
+      <h2>El proceso</h2>
+      <ol class="proceso">
+        <li>
+          <strong>Descargar.</strong> El documento original se guarda tal cual y se registra su
+          hash SHA-256, la URL y la fecha de descarga. Nada se digiere desde una descarga en vivo.
+        </li>
+        <li>
+          <strong>Extraer.</strong> Del PDF, la planilla o la API se sacan los datos crudos con
+          scripts versionados. La extracción es reproducible: cualquiera con el documento original
+          debería obtener las mismas tablas.
+        </li>
+        <li>
+          <strong>Limpiar.</strong> Normalización de nombres, códigos territoriales, unidades y
+          años base. Todo redondeo ocurre acá, no en el sitio.
+        </li>
+        <li>
+          <strong>Validar.</strong> Pruebas automáticas de invariantes: totales que deben cuadrar,
+          rangos de fechas, ausencia de nulos en las llaves, códigos de comuna válidos. Un dato que
+          no pasa las pruebas no llega al sitio.
+        </li>
+        <li>
+          <strong>Verificar a mano.</strong> Antes de publicar, las cifras del artículo se
+          contrastan contra el documento original en una segunda pasada independiente de la
+          extracción.
+        </li>
+        <li>
+          <strong>Publicar.</strong> Los datos procesados quedan en la
+          <a href="/datos/">Despensa</a> con licencia, para que cualquiera repita o refute el
+          análisis.
+        </li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Conflicto de interés</h2>
+      {/*
+        §12 pide una regla "simple y defendible" definida desde el día uno. La
+        primera parte es la política; la segunda depende de quién publica y hay
+        que completarla ANTES de la primera pieza — está marcada como pendiente
+        a propósito, para que no pase inadvertida.
+      */}
+      <p>
+        <strong>digerido</strong> usa exclusivamente fuentes públicas descargables por cualquier
+        persona, con URL, fecha de descarga y hash registrados. No se usan datos obtenidos por vía
+        institucional, acceso privilegiado ni solicitudes no públicas — aunque fueran legales de
+        obtener y de publicar.
+      </p>
+      <p>
+        Además, el sitio se abstiene de digerir los instrumentos sobre los que quien publica tiene
+        responsabilidad directa. La abstención es por materia, no por conclusión: no se elige el
+        tema según lo que los datos vayan a mostrar.
+      </p>
+      <p class="pendiente">
+        <strong>Por completar antes de la primera publicación:</strong> el listado explícito de
+        materias en las que este sitio se abstiene, con el rol institucional que lo motiva. Una
+        política de conflicto de interés sin las materias nombradas no es una política.
+      </p>
+    </section>
+
+    <section>
+      <h2>Errores y correcciones</h2>
+      <p>
+        Un error factual destruye la credibilidad de todo el sitio, no solo de la pieza donde
+        ocurre. Por eso:
+      </p>
+      <ul>
+        <li>Cada digestión declara al final qué <em>no</em> se sabe y qué limitaciones tiene.</li>
+        <li>
+          Las correcciones se registran con fecha en la pieza corregida y quedan visibles. No se
+          edita en silencio.
+        </li>
+        <li>
+          Si un error cambia el hallazgo, se dice en la apertura, no en una nota al pie.
+        </li>
+      </ul>
+      <p class="utilidad">
+        ¿Encontraste un error? Es la contribución más útil posible al sitio.
+      </p>
+    </section>
+
+    <section>
+      <h2>Cuando la fuente cambia</h2>
+      <p>
+        Los organismos reemplazan documentos sin aviso: la URL sigue igual y el contenido cambia.
+        Por eso cada fuente queda registrada con su hash. Un chequeo periódico revalida los hashes y
+        avisa cuando uno se mueve, y los datos publicados nunca dependen de una descarga en vivo:
+        una digestión sigue diciendo lo mismo aunque el original desaparezca.
+      </p>
+
+      {
+        registro.length > 0 ? (
+          <div class="marco-tabla">
+            <table>
+              <caption class="sr-only">
+                Registro de descargas de documentos originales, con su hash SHA-256
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col">Organismo</th>
+                  <th scope="col">Documento</th>
+                  <th scope="col">Descargado</th>
+                  <th scope="col">SHA-256</th>
+                </tr>
+              </thead>
+              <tbody>
+                {registro.map((r) => (
+                  <tr>
+                    <th scope="row">{r.organismo}</th>
+                    <td>
+                      <a href={r.url} target="_blank" rel="noopener">
+                        {r.titulo}
+                      </a>
+                      {r.cambio && <span class="cambio">{r.cambio}</span>}
+                    </td>
+                    <td>
+                      <time datetime={fechaISO(r.fechaDescarga)}>
+                        {formatoFecha(r.fechaDescarga)}
+                      </time>
+                    </td>
+                    <td><code title={r.sha256}>{hashCorto(r.sha256)}</code></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p class="utilidad">
+            El registro de fuentes se llena con la primera digestión publicada.
+          </p>
+        )
+      }
+    </section>
+
+    <section>
+      <h2>Licencias</h2>
+      <p>
+        El texto y los gráficos de <strong>digerido</strong> están bajo
+        <a href="https://creativecommons.org/licenses/by/4.0/deed.es" rel="license">CC BY 4.0</a>:
+        se pueden reutilizar, incluso comercialmente, citando la fuente y enlazando la pieza.
+      </p>
+      <p>
+        Los datos procesados en la <a href="/datos/">Despensa</a> declaran su licencia caso a caso.
+        Los documentos originales pertenecen a sus organismos emisores y se enlazan, no se
+        rehospedan.
+      </p>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .metodo {
+    padding-block: var(--espacio-3xl) var(--espacio-2xl);
+  }
+
+  .bajada {
+    margin-block-start: var(--espacio-md);
+    font-size: var(--tipo-lg);
+    line-height: var(--interlinea-corta);
+    color: var(--color-tinta-suave);
+  }
+
+  section {
+    margin-block-start: var(--espacio-3xl);
+  }
+
+  h2 {
+    font-size: var(--tipo-xl);
+    padding-block-end: var(--espacio-xs);
+    border-block-end: 2px solid var(--color-tinta);
+    margin-block-end: var(--espacio-md);
+  }
+
+  p + p,
+  p + ul,
+  p + ol {
+    margin-block-start: var(--espacio-md);
+  }
+
+  :is(ul, ol):not(.proceso) {
+    display: grid;
+    gap: var(--espacio-xs);
+    padding-inline-start: var(--espacio-lg);
+  }
+
+  /* Proceso numerado con folios monoespaciados: el sitio numera como un oficio. */
+  .proceso {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: var(--espacio-md);
+    counter-reset: paso;
+  }
+
+  .proceso li {
+    counter-increment: paso;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--espacio-md);
+  }
+
+  .proceso li::before {
+    content: counter(paso, decimal-leading-zero);
+    font-family: var(--fuente-utilidad);
+    font-size: var(--tipo-2xs);
+    color: var(--color-sello);
+    letter-spacing: var(--tracking-versalita);
+    padding-block-start: 0.35em;
+  }
+
+  /* La política incompleta se marca en amarillo de trámite: visible para
+     cualquiera que lea la página, imposible de olvidar antes de publicar. */
+  .pendiente {
+    padding: var(--espacio-md);
+    background: var(--color-papel-bajo);
+    border-inline-start: 4px solid var(--color-bilis);
+    font-size: var(--tipo-sm);
+  }
+
+  .marco-tabla {
+    overflow-x: auto;
+    border: 1px solid var(--color-borde);
+    margin-block-start: var(--espacio-md);
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-family: var(--fuente-utilidad);
+    font-size: var(--tipo-2xs);
+  }
+
+  :is(th, td) {
+    text-align: start;
+    padding: var(--espacio-xs) var(--espacio-sm);
+    border-block-end: 1px solid var(--color-borde);
+    vertical-align: baseline;
+  }
+
+  thead th {
+    background: var(--color-papel-bajo);
+    font-weight: var(--peso-semi);
+    letter-spacing: var(--tracking-amplio);
+    text-transform: uppercase;
+    font-size: var(--tipo-3xs);
+  }
+
+  tbody th {
+    font-weight: var(--peso-bold);
+    white-space: nowrap;
+  }
+
+  .cambio {
+    display: block;
+    color: var(--color-bilis);
+    font-size: var(--tipo-3xs);
+  }
+
+  code {
+    background: var(--color-papel-bajo);
+    padding-inline: var(--espacio-2xs);
+    cursor: help;
+  }
+</style>

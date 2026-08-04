@@ -1,0 +1,328 @@
+---
+/**
+ * Shell de artículo (§10).
+ *
+ * Impone la estructura narrativa estándar sin obligarla: la apertura (etiqueta
+ * nutricional + hallazgo) y el cierre (limitaciones, correcciones, fuentes) los
+ * pone el layout, así el MDX solo contiene los pasos 1 a 5. Nadie puede
+ * publicar una pieza sin método y fuentes visibles porque no están en el MDX:
+ * están acá.
+ */
+import type { CollectionEntry } from 'astro:content';
+
+import EtiquetaNutricional from '@digerido/kit/ui/EtiquetaNutricional.svelte';
+import CitaFuente from '@digerido/kit/ui/CitaFuente.svelte';
+import Descarga from '@digerido/kit/ui/Descarga.svelte';
+import { duracion, fechaISO, formatoFecha } from '@digerido/kit/utils';
+
+import Base from './Base.astro';
+
+interface Props {
+  digestion: CollectionEntry<'digestiones'>;
+}
+
+const { digestion } = Astro.props;
+const d = digestion.data;
+
+/**
+ * La etiqueta se arma desde las métricas del pipeline. Si la pieza aún no las
+ * tiene (borrador), se muestran solo los tiempos de lectura, que sí son
+ * obligatorios en el esquema.
+ */
+const original = {
+  ...(d.fuentes[0]?.paginas !== undefined ? { paginas: d.fuentes[0].paginas } : {}),
+  palabras: d.etiqueta?.palabrasOriginal ?? 0,
+  ...(d.etiqueta?.siglasSinDefinir !== undefined
+    ? { siglasSinDefinir: d.etiqueta.siglasSinDefinir }
+    : {}),
+  legibilidad: d.etiqueta?.legibilidadOriginal ?? 0,
+  tiempoLectura: d.tiempoLectura.original,
+};
+
+const digerido = {
+  tiempoLectura: d.tiempoLectura.digerido,
+  graficos: d.etiqueta?.graficos ?? 0,
+  legibilidad: d.etiqueta?.legibilidadDigerido ?? 0,
+};
+---
+
+<Base
+  titulo={d.titulo}
+  descripcion={d.bajada}
+  imagenOG={`/og/${digestion.id}.png`}
+  tipo="article"
+  noIndexar={d.estado !== 'publicada' || d.demo}
+  publicado={d.fecha}
+  modificado={d.actualizado}
+>
+  {
+    /*
+      Aviso de andamiaje. Va ANTES del título y es imposible de confundir con el
+      artículo: una pieza con cifras sintéticas no debe poder leerse como una
+      digestión real ni por accidente ni fuera de contexto.
+    */
+    d.demo && (
+      <div class="aviso-demo">
+        <div class="contenedor">
+          <p>
+            <strong>Pieza de ejemplo.</strong> Esta digestión existe para probar el sistema de
+            diseño y el pipeline. Las cifras son <strong>sintéticas</strong>: no describen ningún
+            documento real y no deben citarse.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  <article>
+    {/* ── 1. El gancho ─────────────────────────────────────────────────── */}
+    <header class="portada">
+      <div class="contenedor portada__interior">
+        <div class="portada__texto">
+          <p class="versalita portada__temas">
+            {d.temas.join(' · ')}
+          </p>
+
+          <h1>{d.titulo}</h1>
+          <p class="bajada">{d.bajada}</p>
+
+          {/*
+            El hallazgo, destacado. Es la frase que justifica la pieza (§2), y
+            lo que un lector se lleva si no lee nada más.
+          */}
+          <p class="hallazgo">{d.hallazgo}</p>
+
+          <dl class="credito utilidad">
+            <div>
+              <dt>Por</dt>
+              <dd>{d.autores.join(', ')}</dd>
+            </div>
+            <div>
+              <dt>Publicado</dt>
+              <dd><time datetime={fechaISO(d.fecha)}>{formatoFecha(d.fecha)}</time></dd>
+            </div>
+            {
+              d.actualizado && (
+                <div>
+                  <dt>Actualizado</dt>
+                  <dd>
+                    <time datetime={fechaISO(d.actualizado)}>{formatoFecha(d.actualizado)}</time>
+                  </dd>
+                </div>
+              )
+            }
+            <div>
+              <dt>Lectura</dt>
+              <dd>{duracion(d.tiempoLectura.digerido)}</dd>
+            </div>
+          </dl>
+        </div>
+
+        {/*
+          La Etiqueta Nutricional abre la pieza (§5). Sin `client:*`: es
+          estática, se renderiza en build y no cuesta un byte de JS.
+        */}
+        <aside class="portada__etiqueta">
+          <EtiquetaNutricional {original} {digerido} />
+        </aside>
+      </div>
+    </header>
+
+    {/* ── 2 a 5. El cuerpo del artículo, desde el MDX ──────────────────── */}
+    <div class="prosa cuerpo">
+      <slot />
+    </div>
+
+    {/* ── 6. Método y fuentes: siempre visible, nunca escondido (§10) ───── */}
+    <footer class="cierre">
+      <div class="contenedor--angosto pila pila--lg">
+        {
+          d.limitaciones.length > 0 && (
+            <section>
+              <h2>Qué no dice esta digestión</h2>
+              <ul class="limitaciones">
+                {d.limitaciones.map((l) => (
+                  <li>{l}</li>
+                ))}
+              </ul>
+            </section>
+          )
+        }
+
+        {
+          d.correcciones.length > 0 && (
+            <section>
+              <h2>Correcciones</h2>
+              <ul class="correcciones utilidad">
+                {d.correcciones.map((c) => (
+                  <li>
+                    <time datetime={fechaISO(c.fecha)}>{formatoFecha(c.fecha)}</time>
+                    <span>{c.descripcion}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )
+        }
+
+        <section>
+          <h2>Fuentes</h2>
+          <div class="pila">
+            {d.fuentes.map((f) => <CitaFuente {...f} />)}
+          </div>
+        </section>
+
+        {
+          d.datasets.length > 0 && (
+            <section>
+              <h2>Datos</h2>
+              <p class="utilidad medida-angosta">
+                Los datos procesados que alimentan esta pieza, tal como los usan los gráficos.
+              </p>
+              <div class="pila">
+                {d.datasets.map((ds) => (
+                  <Descarga {...ds} />
+                ))}
+              </div>
+            </section>
+          )
+        }
+
+        <section>
+          <h2>Método</h2>
+          <p class="medida-angosta">
+            Cómo se extrajeron, limpiaron y verificaron estos datos, y qué política editorial
+            sigue el sitio, está en <a href="/metodo/">Método</a>.
+          </p>
+        </section>
+      </div>
+    </footer>
+  </article>
+</Base>
+
+<style>
+  /* ── Aviso de andamiaje ─────────────────────────────────────────────── */
+  .aviso-demo {
+    background: var(--color-bilis);
+    color: var(--color-papel);
+    padding-block: var(--espacio-sm);
+  }
+
+  .aviso-demo p {
+    font-family: var(--fuente-utilidad);
+    font-size: var(--tipo-2xs);
+    line-height: 1.5;
+    max-width: var(--medida-ancha);
+  }
+
+  /* ── Portada ─────────────────────────────────────────────────────────── */
+  .portada {
+    padding-block: var(--espacio-3xl) var(--espacio-2xl);
+    border-block-end: 1px solid var(--color-borde);
+  }
+
+  .portada__interior {
+    display: grid;
+    gap: var(--espacio-2xl);
+    align-items: start;
+  }
+
+  /* La etiqueta se pone al lado del titular solo cuando hay ancho real para
+     las dos cosas; antes de eso va debajo, a ancho completo. */
+  @media (min-width: 62rem) {
+    .portada__interior {
+      grid-template-columns: 1fr minmax(20rem, 26rem);
+    }
+  }
+
+  .portada__temas {
+    color: var(--color-sello);
+    margin-block-end: var(--espacio-md);
+  }
+
+  h1 {
+    max-width: 24ch;
+  }
+
+  .bajada {
+    font-size: var(--tipo-lg);
+    line-height: var(--interlinea-corta);
+    color: var(--color-tinta-suave);
+    max-width: var(--medida-angosta);
+    margin-block-start: var(--espacio-md);
+  }
+
+  /* El hallazgo: filete grueso a la izquierda, como una nota al margen sellada
+     en el documento. Es la única cita destacada de la pieza. */
+  .hallazgo {
+    margin-block-start: var(--espacio-xl);
+    padding-inline-start: var(--espacio-md);
+    border-inline-start: 4px solid var(--color-bilis);
+    font-family: var(--fuente-display);
+    font-size: var(--tipo-lg);
+    line-height: var(--interlinea-corta);
+    font-weight: var(--peso-media);
+    max-width: var(--medida-angosta);
+    text-wrap: balance;
+  }
+
+  .credito {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--espacio-xs) var(--espacio-lg);
+    margin-block-start: var(--espacio-xl);
+    padding-block-start: var(--espacio-md);
+    border-block-start: 1px solid var(--color-borde);
+  }
+
+  .credito dt {
+    letter-spacing: var(--tracking-versalita);
+    text-transform: uppercase;
+    font-size: var(--tipo-3xs);
+    color: var(--color-sello);
+  }
+
+  .credito dd {
+    margin: 0;
+    color: var(--color-tinta);
+  }
+
+  /* ── Cuerpo ──────────────────────────────────────────────────────────── */
+  .cuerpo {
+    padding-block: var(--espacio-3xl);
+  }
+
+  /* ── Cierre ──────────────────────────────────────────────────────────── */
+  .cierre {
+    padding-block: var(--espacio-2xl);
+    border-block-start: 4px solid var(--color-tinta);
+  }
+
+  .cierre h2 {
+    font-size: var(--tipo-xl);
+    margin-block-end: var(--espacio-md);
+  }
+
+  .limitaciones {
+    display: grid;
+    gap: var(--espacio-sm);
+    padding-inline-start: var(--espacio-lg);
+    max-width: var(--medida-angosta);
+  }
+
+  .correcciones {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: var(--espacio-sm);
+    max-width: var(--medida-angosta);
+  }
+
+  .correcciones li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--espacio-md);
+    padding-block-end: var(--espacio-sm);
+    border-block-end: 1px solid var(--color-borde);
+  }
+</style>

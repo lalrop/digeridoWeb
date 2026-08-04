@@ -1,0 +1,197 @@
+/**
+ * Orden de capas (§2.1): declarado UNA vez, acá y antes que todo.
+ *
+ * "`@layer tokens, base, layout, components, utilities` evita las guerras de
+ * especificidad." Que el orden esté declarado arriba significa que una utilidad
+ * de una línea siempre gana sobre un componente sin necesidad de `!important`,
+ * y que un componente nunca es pisado por un selector de `base` más específico.
+ */
+@layer tokens, base, layout, components, utilities;
+
+/* Los tokens generados desde packages/tokens declaran su propio @layer tokens. */
+@import '@digerido/tokens/tokens.css';
+
+@layer base {
+  /* ── Reset acotado ────────────────────────────────────────────────────── */
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  * {
+    margin: 0;
+  }
+
+  html {
+    /* `text-size-adjust` evita que iOS agrande el cuerpo en landscape y rompa
+       la medida de lectura. */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    /* Sin scroll-behavior: smooth global: pelea con el scrollytelling y marea.
+       El salto a un ancla debe ser instantáneo. */
+    scroll-padding-block-start: var(--espacio-xl);
+    /* La grilla del artículo cuelga de acá (§5). */
+    color-scheme: light;
+  }
+
+  body {
+    background: var(--color-papel);
+    color: var(--color-tinta);
+    font-family: var(--fuente-cuerpo);
+    font-size: var(--tipo-base);
+    line-height: var(--interlinea-cuerpo);
+    /* Rasterización más fiel para una serif en pantalla. */
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    /* El body NUNCA scrollea horizontal: lo hacen los marcos de figura. */
+    overflow-x: hidden;
+  }
+
+  /* ── Tipografía ───────────────────────────────────────────────────────── */
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--fuente-display);
+    font-weight: var(--peso-semi);
+    line-height: var(--interlinea-ajustada);
+    letter-spacing: var(--tracking-ajustado);
+    /* Reparte las líneas de un titular en vez de dejar una palabra huérfana. */
+    text-wrap: balance;
+  }
+
+  h1 {
+    font-size: var(--tipo-4xl);
+  }
+  h2 {
+    font-size: var(--tipo-2xl);
+    line-height: var(--interlinea-corta);
+  }
+  h3 {
+    font-size: var(--tipo-xl);
+    line-height: var(--interlinea-corta);
+  }
+  h4 {
+    font-size: var(--tipo-lg);
+    line-height: var(--interlinea-corta);
+  }
+
+  p {
+    /* `pretty` evita huérfanas al final de párrafo; es lo que más se nota en
+       una pieza de lectura larga. */
+    text-wrap: pretty;
+  }
+
+  /* Cifras en prosa alineadas y proporcionales; en tablas, tabulares. */
+  :is(table, .cifra, code, time) {
+    font-variant-numeric: tabular-nums;
+  }
+
+  code,
+  kbd,
+  samp,
+  pre {
+    font-family: var(--fuente-utilidad);
+    font-size: 0.9em;
+  }
+
+  /* ── Enlaces ──────────────────────────────────────────────────────────── */
+  a {
+    color: inherit;
+    /* Subrayado fino y separado: legible sin cortar las descendentes. */
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.18em;
+    text-decoration-color: var(--color-borde-fuerte);
+    transition: text-decoration-color var(--duracion-rapida) var(--curva-salida);
+  }
+
+  a:hover {
+    text-decoration-color: var(--color-bilis);
+  }
+
+  /* Foco visible en TODO control (§8). El verde ácido acá es correcto: es
+     exactamente el elemento que el lector controla. */
+  :focus-visible {
+    outline: 2px solid var(--color-enzima);
+    outline-offset: 3px;
+    /* Contorno de tinta detrás del verde: el enzima solo no pasa contraste
+       sobre papel, y un foco invisible es un foco roto. */
+    box-shadow: 0 0 0 4px var(--color-tinta);
+    border-radius: var(--radio-sm);
+  }
+
+  /* Quita el outline por defecto solo cuando hay :focus-visible disponible. */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* ── Medios ───────────────────────────────────────────────────────────── */
+  img,
+  picture,
+  svg,
+  video {
+    display: block;
+    max-width: 100%;
+  }
+
+  img,
+  video {
+    height: auto;
+  }
+
+  /* ── Formularios ──────────────────────────────────────────────────────── */
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+    color: inherit;
+  }
+
+  button {
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+
+  /* ── Movimiento ───────────────────────────────────────────────────────── */
+  /* No se pone todo en 0s: `0.01ms` mantiene los callbacks de transitionend
+     funcionando, que es lo que rompe componentes cuando se anula del todo. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* ── Selección e impresión ────────────────────────────────────────────── */
+  ::selection {
+    background: var(--color-enzima);
+    color: var(--color-tinta);
+  }
+
+  @media print {
+    /* Una digestión impresa debe seguir siendo legible: es un documento sobre
+       documentos. Los gráficos se imprimen; las islas interactivas no. */
+    body {
+      background: #fff;
+    }
+
+    a::after {
+      content: ' (' attr(href) ')';
+      font-size: 0.8em;
+      color: #555;
+    }
+
+    figure,
+    table {
+      break-inside: avoid;
+    }
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "_aviso": "DATOS SINTÉTICOS. Generados para probar el sistema de diseño de digerido. No describen ningún documento real y no deben citarse.",
+  "unidad": "MM$ de 2026",
+  "partidas": [
+    {
+      "partida": "Salud",
+      "monto": 4820,
+      "variacion": 31.4,
+      "destacado": true
+    },
+    {
+      "partida": "Educación",
+      "monto": 3910,
+      "variacion": 10.2,
+      "destacado": false
+    },
+    {
+      "partida": "Trabajo y Previsión",
+      "monto": 3140,
+      "variacion": 8.7,
+      "destacado": false
+    },
+    {
+      "partida": "Obras Públicas",
+      "monto": 1980,
+      "variacion": -4.1,
+      "destacado": false
+    },
+    {
+      "partida": "Interior",
+      "monto": 1520,
+      "variacion": 6.3,
+      "destacado": false
+    },
+    {
+      "partida": "Vivienda",
+      "monto": 1310,
+      "variacion": 12.8,
+      "destacado": false
+    },
+    {
+      "partida": "Justicia",
+      "monto": 870,
+      "variacion": -2.4,
+      "destacado": false
+    },
+    {
+      "partida": "Agricultura",
+      "monto": 540,
+      "variacion": 1.9,
+      "destacado": false
+    }
+  ],
+  "total": 18090
+}
