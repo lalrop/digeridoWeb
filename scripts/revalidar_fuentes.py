@@ -29,8 +29,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from pipelines._common.descarga import descargar  # noqa: E402
-from pipelines._common.log import log  # noqa: E402
+from pipelines._common.descarga import descargar
+from pipelines._common.log import log
 
 RAIZ = Path(__file__).resolve().parents[1]
 DIR_FUENTES = RAIZ / "apps" / "web" / "src" / "content" / "fuentes"
@@ -77,7 +77,7 @@ def main() -> int:
 
             try:
                 reg = descargar(url, Path(tmp) / archivo.stem, forzar=True)
-            except Exception as e:  # noqa: BLE001 - se reporta y se sigue
+            except Exception as e:
                 errores += 1
                 log.error("no se pudo descargar %s: %s", url, e)
                 cambios.append(f"[ERROR] {datos['organismo']} — {url}\n         {e}")
@@ -95,7 +95,9 @@ def main() -> int:
                     f"         ahora:      {reg.sha256}"
                 )
 
-    log.info("%d fuente(s) revisada(s), %d cambio(s), %d error(es)", revisadas, len(cambios), errores)
+    log.info(
+        "%d fuente(s) revisada(s), %d cambio(s), %d error(es)", revisadas, len(cambios), errores
+    )
 
     if args.formato == "github":
         (RAIZ / "cambios.txt").write_text(

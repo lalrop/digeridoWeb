@@ -75,6 +75,9 @@ dentro de `apps/web`.
 
 ## Crear una digestión
 
+Guía completa paso a paso, incluido cómo queda un dataset publicado en la
+Despensa: **[`docs/AGREGAR-DIGESTIONES.md`](docs/AGREGAR-DIGESTIONES.md)**.
+
 ```bash
 pnpm nueva-digestion "Presupuesto 2027"
 ```
