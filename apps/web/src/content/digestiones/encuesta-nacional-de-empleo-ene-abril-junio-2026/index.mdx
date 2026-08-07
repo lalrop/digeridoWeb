@@ -1,0 +1,106 @@
+---
+titulo: 'Encuesta nacional de empleo (ENE) abril - junio 2026'
+# Máximo 220 caracteres. Lo que se lee bajo el título y en los metadatos.
+bajada: 'El empleo creció por transporte, servicios administrativos, salud y actividades profesionales, pero no compensa el alza del desempleo — y una porción creciente de los nuevos empleos es tiempo parcial involuntario.'
+# LA FRASE ÚNICA. Una sola oración, sin jerga. Si no existe, no se publica (§2).
+# El esquema rechaza más de un punto final y más de 180 caracteres.
+hallazgo: 'El tiempo parcial involuntario subió 14,5% en un año: más personas quieren trabajar más horas y no lo logran.'
+fecha: 2026-08-05
+autores: ['digerido']
+# presupuesto · economia · salud · educacion · medioambiente · legislativo ·
+# compras-publicas · territorio
+temas: ['economia']
+# 1 = legible, 5 = ilegible. Alimenta la etiqueta nutricional.
+dificultadOriginal: 5
+# Minutos. El esquema exige que el digerido sea MENOR que el original.
+tiempoLectura:
+  original: 10
+  # Medido con tiempoLectura() sobre el texto final del artículo (703 palabras).
+  digerido: 4
+# Las escribe el pipeline (30_publicar.py) y se copian de pipelines/encuesta-nacional-de-empleo-ene-abril-junio-2026/…/meta.json.
+# No las estimes a mano: es así como se cuela un error factual (§13).
+etiqueta:
+  palabrasOriginal: 1963
+  siglasSinDefinir: 9
+  legibilidadOriginal: 0
+  # Medido con legibilidad() sobre el texto final del artículo: 71/100, "bastante fácil".
+  legibilidadDigerido: 71
+  graficos: 1
+# Sin fuente verificable el build falla. El sha256 lo registra 00_descargar.py.
+fuentes:
+  - titulo: 'Boletín Estadístico: Empleo Trimestral — Edición n°333'
+    organismo: 'INE'
+    url: 'https://www.ine.gob.cl/docs/default-source/ocupacion-y-desocupacion/boletines/2026/nacional/ene-nacional-333.pdf?sfvrsn=591ec29a_4'
+    fechaPublicacion: 2026-07-31
+    fechaDescarga: 2026-08-05
+    sha256: 'b509f23cdcab85579362f2a0433375ad3108680dfa12442d288f9eebd96b46f6'
+    paginas: 6
+    formato: 'pdf'
+# Publicados en /datos/ con licencia. Los produce 30_publicar.py.
+datasets:
+  - nombre: 'Variación de ocupados por sector económico (12 meses)'
+    archivo: 'encuesta-nacional-de-empleo-ene-abril-junio-2026/datos.json'
+    licencia: 'CC BY 4.0'
+    descripcion: 'Variación porcentual interanual de personas ocupadas para los 7 sectores destacados por el INE en el boletín del trimestre móvil abril-junio 2026.'
+    filas: 7
+    bytes: 447
+destacada: false
+# 'borrador' hasta que pase el checklist de §10. 'publicada' exige etiqueta
+# completa y al menos una limitación declarada.
+estado: 'publicada'
+# Qué NO dice esta digestión. Obligatorio antes de publicar (§10).
+limitaciones:
+  - 'El gráfico muestra los 7 sectores que el propio INE destacó como las mayores variaciones del trimestre, no los cerca de 20 sectores económicos completos: sectores con cambios intermedios no aparecen.'
+  - 'La evolución histórica de la tasa de desocupación (la serie de trimestres móviles) no se pudo extraer: en el PDF original es una imagen, no datos seleccionables. Esta pieza muestra la fotografía del trimestre, no la trayectoria completa.'
+  - "La caída de -44% en personas que trabajan 45 horas semanales probablemente está influida por la reducción legal de la jornada laboral en curso ('Ley 40 horas'). Esta pieza no separa ese efecto normativo de decisiones reales de empleo."
+  - 'La ENE es una encuesta muestral con margen de error. El propio INE advierte que algunas variaciones citadas en el documento original (como la comparación con cotizantes de AFP) no son estadísticamente significativas.'
+  - 'Es una cifra nacional agregada: no hay desagregación regional ni por comuna en esta pieza.'
+# Log de correcciones público, con fecha (§13). No se edita en silencio.
+correcciones: []
+---
+
+import EncuestaNacionalDeEmpleoEneAbrilJunio2026 from './components/EncuestaNacionalDeEmpleoEneAbrilJunio2026.svelte';
+import datos from '../../../../public/data/encuesta-nacional-de-empleo-ene-abril-junio-2026/datos.json';
+
+## El gancho
+
+La desocupación llegó a 9,4% este trimestre, y esa va a ser la cifra del día en las noticias. Pero atrás hay otra que se mueve mucho más rápido y casi no se menciona: 647.379 personas están trabajando menos horas de las que quieren, y ese grupo creció 14,5% en solo un año — dieciséis veces más rápido que el empleo total.
+
+## El original
+
+Esta pieza digiere el *Boletín Estadístico: Empleo Trimestral*, edición n.º 333, que el Instituto Nacional de Estadísticas (INE) publicó el 31 de julio de 2026 sobre el trimestre móvil abril-junio. Son 6 páginas a dos columnas, con gráficos, tablas y notas al pie que citan fórmulas como esta, tal cual aparece en el documento:
+
+> SU2 = (desocupados + iniciadores disponibles + tiempo parcial involuntario) / (fuerza de trabajo + iniciadores disponibles)
+
+Cuando medimos qué tan fácil es de leer este documento, el resultado fue **0 sobre 100** — el peor nivel posible en la escala que usamos, "muy difícil". Encontramos 9 siglas que el boletín usa sin explicarlas la primera vez que aparecen (SU1, SU2, SU3, TPV, TPI, NS/NR, CISE-93, CISO-18, entre otras). Y el dato que le da título a esta pieza —que 647 mil personas quieren trabajar más horas y no consiguen— no está en los recuadros destacados de la portada. Está en la página 4, en un párrafo entre notas técnicas.
+
+## La traducción
+
+Antes de llegar a esa cifra, el boletín cuenta otra historia: qué sectores están contratando y cuáles están despidiendo. Cuatro sectores explican casi toda la creación de empleo del año — servicios administrativos y de apoyo, actividades profesionales, transporte y salud. Comunicaciones, minería y administración pública, en cambio, perdieron trabajadores.
+
+{/* El gráfico principal va a ancho de figura, no de texto. */}
+<div class="carril-ancho">
+  <EncuestaNacionalDeEmpleoEneAbrilJunio2026 datos={datos.filas} unidad={datos.unidad} client:visible />
+</div>
+
+Ningún sector por sí solo explica por qué la desocupación sigue subiendo — de hecho, el empleo total sí creció (0,9%). El problema no es que no se cree empleo: es que se crea más lento que la cantidad de gente que busca trabajo, y una porción cada vez mayor de los empleos nuevos no da las horas que la persona necesita.
+
+## La exploración
+
+Un par de datos más, para quien quiera mirar más de cerca:
+
+**Por sexo.** La desocupación femenina (10,4%) sigue siendo más alta que la masculina (8,7%), y la brecha no se cerró este trimestre.
+
+**Por horas trabajadas.** De las 9,4 millones de personas ocupadas, 2 millones (21,3%) trabajan tiempo parcial (1 a 30 horas semanales). De ellas, 647.379 no eligieron esa jornada: quieren trabajar más y no consiguen — es el **tiempo parcial involuntario**, y es el que creció 14,5% en el año. El tiempo parcial *voluntario*, en cambio, creció solo 3,4%: la diferencia no es menor.
+
+**Un dato raro.** Las personas que trabajan exactamente 45 horas a la semana cayeron 44% en un año. No es que esas 443.027 personas se hayan quedado sin trabajo: coincide con la reducción legal de la jornada laboral que Chile está aplicando en etapas (la "Ley 40 horas"), que corrió a mucha gente de esa categoría hacia jornadas más cortas. Vale la pena tenerlo en cuenta antes de sacar conclusiones sobre esa cifra en particular.
+
+**El indicador que junta todo.** El propio INE calcula una tasa que combina desocupación y tiempo parcial involuntario, llamada SU2. Llegó a 15,9%, subiendo 1,2 puntos porcentuales en el trimestre — más del doble de rápido que la tasa de desocupación oficial (+0,5 pp).
+
+## El cierre
+
+La desocupación oficial (9,4%) es la cifra que se lee en la prensa. Pero el propio INE ya construyó un indicador que cuenta una historia más completa —SU2, que suma a los desocupados quienes trabajan menos horas de las que quieren— y ese indicador subió más del doble de rápido. Es una señal de que el mercado laboral no solo tiene menos empleo: tiene empleo de peor calidad para una parte de quienes sí consiguieron trabajo.
+
+Lo que este boletín no responde es si la tendencia va a seguir. El próximo trimestre móvil (mayo-julio) se publica en más o menos un mes, y va a mostrar si el tiempo parcial involuntario sigue creciendo a este ritmo o si fue un salto puntual. Tampoco separa cuánto de la caída en personas que trabajan 45 horas se debe a la reducción legal de la jornada laboral y cuánto a otros factores — haría falta cruzar esta encuesta con los datos de esa reforma para saberlo.
+
+Cómo se construyeron estos datos, con el hash y la fecha de descarga del documento original, está en [Método](/metodo/).

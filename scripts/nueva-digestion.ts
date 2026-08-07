@@ -265,12 +265,14 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
+from urllib.parse import urlsplit
 
 from pipelines._common.descarga import descargar, verificar_hash
 from pipelines._common.log import log
 
 AQUI = Path(__file__).resolve().parent
 CRUDO = AQUI / "raw"
+SLUG = "${slug}"
 
 # TODO: la URL del documento original.
 URL = ""
@@ -285,11 +287,14 @@ def main() -> int:
         log.error("definí URL en este script antes de correrlo")
         return 1
 
-    destino = CRUDO / URL.rsplit("/", 1)[-1]
+    # `URL.rsplit("/", 1)[-1]` se queda con el query string (?sfvrsn=...) pegado
+    # al nombre: Windows rechaza el "?" en un nombre de archivo. urlsplit().path
+    # descarta query y fragment antes de tomar el último segmento.
+    destino = CRUDO / urlsplit(URL).path.rsplit("/", 1)[-1]
     reg = descargar(URL, destino, forzar=args.forzar)
 
     # Avisa si el organismo reemplazó el documento sin cambiar la URL (§13).
-    meta = AQUI.parent.parent / "apps/web/src/content/digestiones/${slug}/meta.json"
+    meta = AQUI.parent.parent / "apps/web/src/content/digestiones" / SLUG / "meta.json"
     if not verificar_hash(meta, URL, reg.sha256):
         return 1
 
@@ -539,7 +544,8 @@ from pipelines._common.invariantes import (
 )
 
 RAIZ = Path(__file__).resolve().parents[3]
-ARTEFACTO = RAIZ / "apps" / "web" / "public" / "data" / "${slug}" / "datos.json"
+SLUG = "${slug}"
+ARTEFACTO = RAIZ / "apps" / "web" / "public" / "data" / SLUG / "datos.json"
 
 
 @pytest.fixture(scope="module")

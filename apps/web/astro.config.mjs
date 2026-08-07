@@ -54,6 +54,16 @@ export default defineConfig({
       // digestión. El chequeo duro está en scripts/presupuesto-rendimiento.ts.
       chunkSizeWarningLimit: 120,
     },
+    ssr: {
+      // Los paquetes del workspace se exportan como fuente TS con imports
+      // "./archivo.js" (la convención de siempre-apuntar-al-emitido). `astro
+      // build` los pasa igual por Vite/Rollup y no falla, pero en `astro dev`
+      // el runtime SSR los deja "externos" y se los entrega al resolver
+      // nativo de Node, que no sabe mapear ese ".js" al ".ts" real —
+      // "Cannot find module '…/color.js'". noExternal fuerza a que Vite
+      // los transforme también en dev.
+      noExternal: ['@digerido/tokens', '@digerido/kit'],
+    },
   },
 
   // Astro 5+ recorta los `<script>` de las islas no hidratadas; con
