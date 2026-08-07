@@ -1,0 +1,37 @@
+# Pipeline de la digestión `encuesta-nacional-de-empleo-ene-abril-junio-2026`.
+#
+# Correr desde la raíz:  just -f pipelines/encuesta-nacional-de-empleo-ene-abril-junio-2026/justfile todo
+
+raiz := justfile_directory() / "../.."
+py := "python3"
+
+default:
+    @just --list --unsorted -f "{{ justfile() }}"
+
+# Pipeline completo: descargar → extraer → limpiar → validar → publicar.
+todo: descargar extraer limpiar test publicar
+    @echo "listo. Actualizá el frontmatter con las métricas del meta.json."
+
+descargar *args:
+    cd "{{ raiz }}" && {{ py }} -m pipelines.encuesta-nacional-de-empleo-ene-abril-junio-2026.00_descargar {{ args }}
+
+extraer:
+    cd "{{ raiz }}" && {{ py }} -m pipelines.encuesta-nacional-de-empleo-ene-abril-junio-2026.10_extraer
+
+limpiar:
+    cd "{{ raiz }}" && {{ py }} -m pipelines.encuesta-nacional-de-empleo-ene-abril-junio-2026.20_limpiar
+
+publicar:
+    cd "{{ raiz }}" && {{ py }} -m pipelines.encuesta-nacional-de-empleo-ene-abril-junio-2026.30_publicar
+
+# Bloquean la publicación.
+test:
+    cd "{{ raiz }}" && {{ py }} -m pytest pipelines/encuesta-nacional-de-empleo-ene-abril-junio-2026/tests -q
+
+# Revalida el hash de la fuente contra el registrado (§13).
+revalidar:
+    cd "{{ raiz }}" && {{ py }} -m pipelines.encuesta-nacional-de-empleo-ene-abril-junio-2026.00_descargar --forzar
+
+# Borra intermedios, conserva las descargas crudas.
+limpiar-cache:
+    rm -rf "{{ justfile_directory() }}/interim"

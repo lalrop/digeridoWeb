@@ -1,0 +1,42 @@
+{
+  "slug": "encuesta-nacional-de-empleo-ene-abril-junio-2026",
+  "generado": "2026-08-05",
+  "fuente": {
+    "url": "https://www.ine.gob.cl/docs/default-source/ocupacion-y-desocupacion/boletines/2026/nacional/ene-nacional-333.pdf?sfvrsn=591ec29a_4",
+    "ruta": "C:\\Users\\lrodr\\Desarrollos\\Digerido\\pipelines\\encuesta-nacional-de-empleo-ene-abril-junio-2026\\raw\\ene-nacional-333.pdf",
+    "sha256": "b509f23cdcab85579362f2a0433375ad3108680dfa12442d288f9eebd96b46f6",
+    "bytes": 2908578,
+    "fecha_descarga": "2026-08-05T20:04:01.077463+00:00",
+    "desde_cache": false
+  },
+  "etiqueta": {
+    "palabrasOriginal": 1963,
+    "siglasSinDefinir": 9,
+    "legibilidadOriginal": 0,
+    "nivelOriginal": "muy difícil",
+    "tiempoLecturaOriginal": 10,
+    "detalle": {
+      "indice": 0,
+      "nivel": "muy difícil",
+      "palabras": 1963,
+      "frases": 119,
+      "silabas": 6225,
+      "silabasPorPalabra": 3.171,
+      "palabrasPorFrase": 16.5
+    }
+  },
+  "artefactos": [
+    {
+      "archivo": "encuesta-nacional-de-empleo-ene-abril-junio-2026/datos.json",
+      "bytes": 447,
+      "filas": 7,
+      "sha256": "bbfa61b17b5934157470ca886150f4a511f9df952d4f7a0e38c07033ab28a8ef"
+    },
+    {
+      "archivo": "encuesta-nacional-de-empleo-ene-abril-junio-2026/datos.csv",
+      "bytes": 201,
+      "filas": 7,
+      "sha256": "cbb8ecad0a6003520de30890ab48f8e99e522b4e2d07fec690372eaa446f4dd6"
+    }
+  ]
+}
