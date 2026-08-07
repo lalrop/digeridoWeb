@@ -32,7 +32,11 @@ include = ["pipelines*"]
 pythonpath = ["."]
 testpaths = ["pipelines"]
 python_files = ["test_*.py"]
-addopts = "-q --strict-markers"
+# Cada digestión trae su propio tests/test_invariantes.py (mismo nombre en
+# todas, es el que arma nueva-digestion.ts): sin --import-mode=importlib,
+# pytest importa el primero como el módulo top-level "test_invariantes" y
+# choca apenas existe una segunda digestión ("import file mismatch").
+addopts = "-q --strict-markers --import-mode=importlib"
 
 [tool.ruff]
 line-length = 100
