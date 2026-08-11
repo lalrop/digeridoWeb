@@ -8,6 +8,11 @@ Bloquea el merge (§10). Marcá cada ítem cuando esté hecho de verdad.
 - [ ] Tests del pipeline en verde (`just -f pipelines/encuesta-nacional-de-empleo-ene-abril-junio-2026/justfile test`).
 - [ ] Todo gráfico tiene título, unidades, fuente y anotación.
 - [ ] Tabla equivalente accesible presente en cada gráfico.
+- [ ] Todo gráfico tiene un nivel real de interacción (scroll o clic) — nunca
+      es una imagen estática (referencia: pudding.cool).
+- [ ] Si el hallazgo trata directamente de personas (no de instituciones ni
+      montos abstractos), se evaluó un `Pictograma` (dibujos de personas)
+      además de o en vez del gráfico de barras/líneas por defecto.
 - [ ] Probado en móvil real, no solo en el emulador.
 - [ ] Presupuesto de rendimiento respetado (`pnpm build && pnpm presupuesto`).
 - [ ] Datasets publicados en `/datos/` con licencia.

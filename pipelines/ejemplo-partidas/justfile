@@ -16,6 +16,7 @@ default:
 # Pipeline completo: descargar → extraer → limpiar → validar → publicar.
 todo: descargar extraer limpiar test publicar
     @echo "pipeline completo. Revisá el meta.json y actualizá el frontmatter."
+    @echo "próximo paso: just -f pipelines/ejemplo-partidas/justfile redactar"
 
 # 00 — obtiene el documento original y registra su hash.
 descargar *args:
@@ -42,6 +43,18 @@ test:
 revalidar:
     cd "{{ raiz }}" && {{ py }} -m pipelines.ejemplo-partidas.00_descargar --forzar
     @echo "compará el sha256 nuevo contra el de meta.json"
+
+# Paso final (asistido) — propuesta de artículo con el agente redactor-digestion.
+# No es un script: el agente vive en .claude/agents/ y solo corre dentro de una
+# sesión de Claude Code (no tiene forma de invocarse desde una terminal sola).
+redactar:
+    @echo "Este paso no corre solo: abrí una sesión de Claude Code en la raíz del repo y pedile"
+    @echo ""
+    @echo "  Usa el agente redactor-digestion para el slug ejemplo-partidas"
+    @echo ""
+    @echo "El agente lee pipelines/ejemplo-partidas/raw/ e interim/, y te muestra 3 opciones de"
+    @echo "cada sección narrativa en pipelines/ejemplo-partidas/PROPUESTA-ARTICULO.md para que"
+    @echo "elijas antes de que escriba el index.mdx definitivo."
 
 # Borra los intermedios pero NO las descargas crudas: volver a bajar un
 # documento de 400 páginas por limpiar un JSON es un desperdicio.

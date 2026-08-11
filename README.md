@@ -152,6 +152,15 @@ hidratar tres gráficos es lo que hace que los sitios de data storytelling pesen
 DOM; D3 aporta escalas, formas y geografías. Es lo que hace que los gráficos sean
 animables, testeables y renderizables en el servidor.
 
+**Referencia editorial: pudding.cool, no un dashboard.** Ningún gráfico es una
+imagen estática al lado del texto — todos tienen scrollytelling
+(`@digerido/kit/scroll/Scrolly.svelte`) o exploración por hover/clic con
+tooltip accesible por teclado. Cuando el hallazgo es directamente sobre
+personas, `@digerido/kit/charts/Pictograma.svelte` las dibuja como grupo de
+figuras (isotype) en vez de reducirlas a una barra. Lo diseña el agente
+`disenador-visualizaciones` (`.claude/agents/`), a partir del ángulo que ya
+eligió `redactor-digestion` para esa pieza.
+
 **CSS nativo con `@layer`, no Tailwind.** Un sitio editorial necesita un sistema
 tipográfico sólido y control fino del grid, no utilidades. El orden de capas se
 declara una vez (`tokens, base, layout, components, utilities`) y elimina las

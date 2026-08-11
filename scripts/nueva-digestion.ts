@@ -117,13 +117,13 @@ import ${claseComponente} from './components/${claseComponente}.svelte';
   ESTRUCTURA NARRATIVA ESTÁNDAR (§10) — adaptable, no rígida.
   Borrá estos comentarios a medida que escribas.
 
-  1. EL GANCHO — la cifra o contradicción que obliga a seguir leyendo.
-  2. EL ORIGINAL — cómo se ve el documento tal cual. Mostrarlo feo es parte
-     del argumento.
-  3. LA TRADUCCIÓN — el gráfico principal, con scrollytelling si aporta.
-  4. LA EXPLORACIÓN — el momento en que el lector busca lo suyo: su comuna,
+  1. EL PLATO DE ENTRADA — la cifra o contradicción que obliga a seguir leyendo.
+  2. LA MATERIA PRIMA — cómo se ve el documento tal cual. Mostrarlo feo es
+     parte del argumento.
+  3. EL PLATO DE FONDO — el gráfico principal, con scrollytelling si aporta.
+  4. LOS APERITIVOS — el momento en que el lector busca lo suyo: su comuna,
      su sector, su año.
-  5. EL CIERRE — qué significa, qué no se sabe, qué habría que preguntar.
+  5. EL POSTRE — qué significa, qué no se sabe, qué habría que preguntar.
 
   El paso 6 (método y fuentes) lo pone el layout. No lo escribas acá.
 
@@ -132,20 +132,20 @@ import ${claseComponente} from './components/${claseComponente}.svelte';
   proyecto de tres meses.
 */}
 
-## El gancho
+## El plato de entrada
 
-## El original
+## La materia prima
 
-## La traducción
+## El plato de fondo
 
 {/* El gráfico principal va a ancho de figura, no de texto. */}
 <div class="carril-ancho">
   {/* <${claseComponente} datos={datos.filas} unidad="" client:visible /> */}
 </div>
 
-## La exploración
+## Los aperitivos
 
-## El cierre
+## El postre
 `;
 
 // ─────────────────────────── componente ───────────────────────────
@@ -595,6 +595,7 @@ default:
 # Pipeline completo: descargar → extraer → limpiar → validar → publicar.
 todo: descargar extraer limpiar test publicar
     @echo "listo. Actualizá el frontmatter con las métricas del meta.json."
+    @echo "próximo paso: just -f pipelines/${slug}/justfile redactar"
 
 descargar *args:
     cd "{{ raiz }}" && {{ py }} -m pipelines.${slug}.00_descargar {{ args }}
@@ -616,6 +617,20 @@ test:
 revalidar:
     cd "{{ raiz }}" && {{ py }} -m pipelines.${slug}.00_descargar --forzar
 
+# Paso final (asistido) — propuesta de artículo con el agente redactor-digestion.
+# No es un script: el agente vive en .claude/agents/ y solo corre dentro de una
+# sesión de Claude Code (no tiene forma de invocarse desde una terminal sola).
+# Esta receta existe para que "el siguiente paso" quede documentado en el mismo
+# lugar que el resto del pipeline, en vez de solo en la cabeza de quien escribe.
+redactar:
+    @echo "Este paso no corre solo: abrí una sesión de Claude Code en la raíz del repo y pedile"
+    @echo ""
+    @echo "  Usa el agente redactor-digestion para el slug ${slug}"
+    @echo ""
+    @echo "El agente lee pipelines/${slug}/raw/ e interim/, y te muestra 3 opciones de"
+    @echo "cada sección narrativa en pipelines/${slug}/PROPUESTA-ARTICULO.md para que"
+    @echo "elijas antes de que escriba el index.mdx definitivo."
+
 # Borra intermedios, conserva las descargas crudas.
 limpiar-cache:
     rm -rf "{{ justfile_directory() }}/interim"
@@ -631,6 +646,11 @@ Bloquea el merge (§10). Marcá cada ítem cuando esté hecho de verdad.
 - [ ] Tests del pipeline en verde (\`just -f pipelines/${slug}/justfile test\`).
 - [ ] Todo gráfico tiene título, unidades, fuente y anotación.
 - [ ] Tabla equivalente accesible presente en cada gráfico.
+- [ ] Todo gráfico tiene un nivel real de interacción (scroll o clic) — nunca
+      es una imagen estática (referencia: pudding.cool).
+- [ ] Si el hallazgo trata directamente de personas (no de instituciones ni
+      montos abstractos), se evaluó un \`Pictograma\` (dibujos de personas)
+      además de o en vez del gráfico de barras/líneas por defecto.
 - [ ] Probado en móvil real, no solo en el emulador.
 - [ ] Presupuesto de rendimiento respetado (\`pnpm build && pnpm presupuesto\`).
 - [ ] Datasets publicados en \`/datos/\` con licencia.
@@ -687,7 +707,10 @@ Siguiente:
   1. Poné la URL del documento en pipelines/${slug}/00_descargar.py
   2. just -f pipelines/${slug}/justfile todo
   3. Copiá las métricas del meta.json al frontmatter del MDX
-  4. Escribí el hallazgo ANTES del artículo. Si no sale en una frase,
+  4. just -f pipelines/${slug}/justfile redactar
+     (te dice cómo pedirle al agente redactor-digestion una propuesta de
+     artículo en pipelines/${slug}/PROPUESTA-ARTICULO.md)
+  5. Escribí el hallazgo ANTES del artículo. Si no sale en una frase,
      todavía no hay pieza.
 
 Rama sugerida:

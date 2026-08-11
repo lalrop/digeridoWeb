@@ -40,7 +40,12 @@ completar pipelines/<slug>/*.py  → 00 descargar · 10 extraer · 20 limpiar ·
         ↓
 completar el frontmatter del MDX  (copiando del meta.json, nunca a mano)
         ↓
-escribir el artículo              (el hallazgo, el gráfico, la exploración)
+just -f pipelines/<slug>/justfile redactar   → agente redactor-digestion propone
+                                                pipelines/<slug>/PROPUESTA-ARTICULO.md
+                                                (3 opciones por sección; solo corre
+                                                dentro de una sesión de Claude Code)
+        ↓
+elegir opciones y escribir el artículo   (el hallazgo, el gráfico, la exploración)
         ↓
 verificar en local                pnpm dev · pnpm test · pnpm build · presupuesto
         ↓
@@ -268,14 +273,39 @@ exista en `public/data/`.
 
 ## Paso 5 · Escribir el artículo
 
+Antes de escribir a mano, podés pedirle una propuesta al agente
+`redactor-digestion` (`.claude/agents/redactor-digestion.md`):
+
+```bash
+just -f pipelines/<slug>/justfile redactar
+```
+
+Esto solo imprime instrucciones — el agente vive en `.claude/agents/` y
+corre dentro de una sesión de Claude Code, no desde una terminal sola. Ahí
+adentro, pedile:
+
+```
+Usa el agente redactor-digestion para el slug <slug>
+```
+
+El agente lee el documento original en `raw/` y los datos ya limpios en
+`interim/`, y escribe `pipelines/<slug>/PROPUESTA-ARTICULO.md` con una
+propuesta de `hallazgo`, `bajada` y `limitaciones`, más **3 versiones
+distintas de cada una de las cinco secciones narrativas** para que elijas
+antes de que toque `index.mdx`. Nunca inventa cifras (todo número sale de
+`interim/` o de una cita textual del documento) y nunca marca la pieza como
+`estado: 'publicada'` — sigue siendo un borrador para revisión humana, igual
+que si lo hubieras escrito vos.
+
 El MDX generado ya trae la estructura narrativa estándar como comentario:
 
-1. **El gancho** — la cifra o contradicción que obliga a seguir leyendo.
-2. **El original** — cómo se ve el documento tal cual (mostrarlo feo es parte
-   del argumento).
-3. **La traducción** — el gráfico principal, con scrollytelling si aporta.
-4. **La exploración** — el momento en que el lector busca lo suyo.
-5. **El cierre** — qué significa, qué no se sabe, qué habría que preguntar.
+1. **El plato de entrada** — la cifra o contradicción que obliga a seguir
+   leyendo.
+2. **La materia prima** — cómo se ve el documento tal cual (mostrarlo feo es
+   parte del argumento).
+3. **El plato de fondo** — el gráfico principal, con scrollytelling si aporta.
+4. **Los aperitivos** — el momento en que el lector busca lo suyo.
+5. **El postre** — qué significa, qué no se sabe, qué habría que preguntar.
 
 El método y las fuentes los agrega el layout solo; no los escribas en el MDX.
 
@@ -292,6 +322,32 @@ falta):
   invoca con una sola etiqueta. Máximo 6 pasos; `<Scrolly>` avisa si te pasás.
 - Máximo 5 series categóricas en un gráfico (`escalaCategorica()` lanza sobre
   5 — es donde los colores dejan de distinguirse bajo dicromacia).
+
+### El gráfico principal: siempre interactivo, nunca estático
+
+digerido.cl toma como referencia www.pudding.cool: ningún gráfico es una
+imagen quieta al lado del texto. El agente `disenador-visualizaciones`
+(`.claude/agents/disenador-visualizaciones.md`) diseña el componente
+Svelte/D3 de la pieza a partir del hallazgo que ya eligió `redactor-digestion`
+(lee `PROPUESTA-ARTICULO.md` o el `index.mdx`), con dos reglas que no se
+negocian:
+
+- **Interacción real**, por scrollytelling (`Scrolly`/`Paso` del kit) o por
+  hover/clic con tooltip accesible por teclado (mirá
+  `FlujoPartidas.svelte`) — nunca un SVG sin ningún `onfocus`/`onmouseenter`.
+- **Dibujos de personas cuando el hallazgo es sobre gente**:
+  `@digerido/kit/charts/Pictograma.svelte` dibuja una grilla de figuras
+  humanas (isotype), con un grupo destacado sobre el resto en gris, para
+  cifras como personas desempleadas, afiliadas o afectadas. No reemplaza
+  todo gráfico —para instituciones, montos o territorios seguí con
+  barras/líneas— pero es la primera opción a evaluar cuando la unidad del
+  hallazgo es la persona.
+
+Invocalo con:
+
+```
+Usa el agente disenador-visualizaciones para el slug <slug>
+```
 
 ---
 
@@ -446,6 +502,7 @@ python3 scripts/revalidar_fuentes.py
 | `just -f pipelines/<slug>/justfile todo` | Corre el pipeline de punta a punta |
 | `just -f pipelines/<slug>/justfile test` | Solo las invariantes de esa digestión |
 | `just -f pipelines/<slug>/justfile revalidar` | Vuelve a chequear el hash de la fuente |
+| `just -f pipelines/<slug>/justfile redactar` | Explica cómo pedirle al agente `redactor-digestion` la propuesta de artículo (solo dentro de Claude Code) |
 | `pnpm dev` | Previsualiza todo, incluidos borradores |
 | `just verificar` | Lo mismo que corre CI, local |
 | `DIGERIDO_EJEMPLOS=1 pnpm build` | Build que incluye piezas de andamiaje/borrador |
