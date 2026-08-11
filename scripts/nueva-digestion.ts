@@ -287,7 +287,7 @@ def main() -> int:
         log.error("definí URL en este script antes de correrlo")
         return 1
 
-    # `URL.rsplit("/", 1)[-1]` se queda con el query string (?sfvrsn=...) pegado
+    # \`URL.rsplit("/", 1)[-1]\` se queda con el query string (?sfvrsn=...) pegado
     # al nombre: Windows rechaza el "?" en un nombre de archivo. urlsplit().path
     # descarta query y fragment antes de tomar el último segmento.
     destino = CRUDO / urlsplit(URL).path.rsplit("/", 1)[-1]
