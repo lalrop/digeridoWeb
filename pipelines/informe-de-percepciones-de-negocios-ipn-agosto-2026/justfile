@@ -1,0 +1,52 @@
+# Pipeline de la digestión `informe-de-percepciones-de-negocios-ipn-agosto-2026`.
+#
+# Correr desde la raíz:  just -f pipelines/informe-de-percepciones-de-negocios-ipn-agosto-2026/justfile todo
+
+raiz := justfile_directory() / "../.."
+py := "python3"
+
+default:
+    @just --list --unsorted -f "{{ justfile() }}"
+
+# Pipeline completo: descargar → extraer → limpiar → validar → publicar.
+todo: descargar extraer limpiar test publicar
+    @echo "listo. Actualizá el frontmatter con las métricas del meta.json."
+    @echo "próximo paso: just -f pipelines/informe-de-percepciones-de-negocios-ipn-agosto-2026/justfile redactar"
+
+descargar *args:
+    cd "{{ raiz }}" && {{ py }} -m pipelines.informe-de-percepciones-de-negocios-ipn-agosto-2026.00_descargar {{ args }}
+
+extraer:
+    cd "{{ raiz }}" && {{ py }} -m pipelines.informe-de-percepciones-de-negocios-ipn-agosto-2026.10_extraer
+
+limpiar:
+    cd "{{ raiz }}" && {{ py }} -m pipelines.informe-de-percepciones-de-negocios-ipn-agosto-2026.20_limpiar
+
+publicar:
+    cd "{{ raiz }}" && {{ py }} -m pipelines.informe-de-percepciones-de-negocios-ipn-agosto-2026.30_publicar
+
+# Bloquean la publicación.
+test:
+    cd "{{ raiz }}" && {{ py }} -m pytest pipelines/informe-de-percepciones-de-negocios-ipn-agosto-2026/tests -q
+
+# Revalida el hash de la fuente contra el registrado (§13).
+revalidar:
+    cd "{{ raiz }}" && {{ py }} -m pipelines.informe-de-percepciones-de-negocios-ipn-agosto-2026.00_descargar --forzar
+
+# Paso final (asistido) — propuesta de artículo con el agente redactor-digestion.
+# No es un script: el agente vive en .claude/agents/ y solo corre dentro de una
+# sesión de Claude Code (no tiene forma de invocarse desde una terminal sola).
+# Esta receta existe para que "el siguiente paso" quede documentado en el mismo
+# lugar que el resto del pipeline, en vez de solo en la cabeza de quien escribe.
+redactar:
+    @echo "Este paso no corre solo: abrí una sesión de Claude Code en la raíz del repo y pedile"
+    @echo ""
+    @echo "  Usa el agente redactor-digestion para el slug informe-de-percepciones-de-negocios-ipn-agosto-2026"
+    @echo ""
+    @echo "El agente lee pipelines/informe-de-percepciones-de-negocios-ipn-agosto-2026/raw/ e interim/, y te muestra 3 opciones de"
+    @echo "cada sección narrativa en pipelines/informe-de-percepciones-de-negocios-ipn-agosto-2026/PROPUESTA-ARTICULO.md para que"
+    @echo "elijas antes de que escriba el index.mdx definitivo."
+
+# Borra intermedios, conserva las descargas crudas.
+limpiar-cache:
+    rm -rf "{{ justfile_directory() }}/interim"

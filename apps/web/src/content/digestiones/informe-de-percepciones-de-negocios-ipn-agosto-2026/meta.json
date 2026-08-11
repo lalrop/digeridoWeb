@@ -1,0 +1,54 @@
+{
+  "slug": "informe-de-percepciones-de-negocios-ipn-agosto-2026",
+  "generado": "2026-08-11",
+  "fuente": {
+    "url": "https://www.bcentral.cl/documents/33528/8548649/IPN+agosto+2026.pdf/2c3775a5-010e-cd01-ae3b-a172aa7949a0?t=1786027152205",
+    "ruta": "pipelines/informe-de-percepciones-de-negocios-ipn-agosto-2026/raw/ipn-agosto-2026.pdf",
+    "sha256": "9f0b0186bcd3ca3d23740da607634529d896c6cf7b43af8e40210a76f2fe0668",
+    "bytes": 8101400,
+    "fecha_descarga": "2026-08-11T14:24:02.825406+00:00",
+    "desde_cache": false
+  },
+  "etiqueta": {
+    "palabrasOriginal": 10346,
+    "siglasSinDefinir": 26,
+    "legibilidadOriginal": 56,
+    "nivelOriginal": "bastante difícil",
+    "tiempoLecturaOriginal": 52,
+    "detalle": {
+      "indice": 56,
+      "nivel": "bastante difícil",
+      "palabras": 10346,
+      "frases": 499,
+      "silabas": 22427,
+      "silabasPorPalabra": 2.168,
+      "palabrasPorFrase": 20.73
+    }
+  },
+  "artefactos": [
+    {
+      "archivo": "informe-de-percepciones-de-negocios-ipn-agosto-2026/datos.json",
+      "bytes": 5840,
+      "filas": 84,
+      "sha256": "bd5707424d5c69f58b6ddca95a4a0ada73bfe6f88a49fad67cda748f954691c8"
+    },
+    {
+      "archivo": "informe-de-percepciones-de-negocios-ipn-agosto-2026/datos.csv",
+      "bytes": 1968,
+      "filas": 84,
+      "sha256": "e90643ae580fee974840371eee3c1acdcbb98aa62cf275c8bf738d3f7c4345f8"
+    },
+    {
+      "archivo": "informe-de-percepciones-de-negocios-ipn-agosto-2026/combustibles.json",
+      "bytes": 406,
+      "filas": 6,
+      "sha256": "6dfbcfb1d7bb234f1a74e27d37659c161018d0d55640371edfb9cc4cf7444c2e"
+    },
+    {
+      "archivo": "informe-de-percepciones-de-negocios-ipn-agosto-2026/combustibles.csv",
+      "bytes": 177,
+      "filas": 6,
+      "sha256": "c537299e6613435c111d2ae1cc7b4ac4b56d3c04fc7959d672832660156eca7e"
+    }
+  ]
+}

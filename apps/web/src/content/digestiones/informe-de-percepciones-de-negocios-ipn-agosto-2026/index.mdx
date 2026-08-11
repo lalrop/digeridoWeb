@@ -1,0 +1,154 @@
+---
+titulo: 'Informe de Percepciones de Negocios (IPN) agosto 2026'
+# Máximo 220 caracteres. Lo que se lee bajo el título y en los metadatos.
+bajada: 'El Banco Central preguntó a cientos de empresas por costos, ventas, crédito e inflación: el desempeño fue más débil de lo esperado, pero lo que más se movió es la inflación que las propias empresas anticipan a dos años.'
+# LA FRASE ÚNICA. Una sola oración, sin jerga. Si no existe, no se publica (§2).
+# El esquema rechaza más de un punto final y más de 180 caracteres.
+hallazgo: 'La inflación esperada a dos años tocó su mínimo histórico a inicios de 2026 y subió después de que un conflicto en Medio Oriente disparara el precio del petróleo.'
+fecha: 2026-08-11
+autores: ['digerido']
+# presupuesto · economia · salud · educacion · medioambiente · legislativo ·
+# compras-publicas · territorio
+temas: ['economia']
+# 1 = legible, 5 = ilegible. Alimenta la etiqueta nutricional.
+# legibilidadOriginal 56/100 = "bastante difícil" en la escala Fernández-Huerta.
+dificultadOriginal: 4
+# Minutos. El esquema exige que el digerido sea MENOR que el original.
+tiempoLectura:
+  original: 52
+  # Medido con tiempoLectura() sobre el texto final del artículo (613 palabras).
+  digerido: 3
+# Las escribe el pipeline (30_publicar.py) y se copian de pipelines/informe-de-percepciones-de-negocios-ipn-agosto-2026/…/meta.json.
+# No las estimes a mano: es así como se cuela un error factual (§13).
+etiqueta:
+  palabrasOriginal: 10346
+  siglasSinDefinir: 26
+  legibilidadOriginal: 56
+  # Medido con legibilidad() sobre el texto final del artículo: 66/100, "normal".
+  legibilidadDigerido: 66
+  graficos: 2
+# Sin fuente verificable el build falla. El sha256 lo registra 00_descargar.py.
+fuentes:
+  - titulo: 'Informe de Percepciones de Negocios (IPN)'
+    organismo: 'Banco Central de Chile'
+    url: 'https://www.bcentral.cl/documents/33528/8548649/IPN+agosto+2026.pdf/2c3775a5-010e-cd01-ae3b-a172aa7949a0?t=1786027152205'
+    fechaPublicacion: 2026-08-05
+    fechaDescarga: 2026-08-11
+    sha256: '9f0b0186bcd3ca3d23740da607634529d896c6cf7b43af8e40210a76f2fe0668'
+    paginas: 36
+    formato: 'pdf'
+# Publicados en /datos/ con licencia. Los produce 30_publicar.py.
+datasets:
+  - nombre: 'Expectativas de inflación (EDEP) a 12 y 24 meses'
+    archivo: 'informe-de-percepciones-de-negocios-ipn-agosto-2026/datos.json'
+    licencia: 'CC BY 4.0'
+    descripcion: 'Media y mediana mensual (2023-2026) de las expectativas de inflación de la Encuesta de Determinantes y Expectativas de Precios (EDEP), a 12 y 24 meses. Serie completa publicada por el Banco Central junto al IPN de agosto 2026.'
+    filas: 84
+    bytes: 5840
+  - nombre: 'Expectativas sobre el precio de los combustibles a 6 meses'
+    archivo: 'informe-de-percepciones-de-negocios-ipn-agosto-2026/combustibles.json'
+    licencia: 'CC BY 4.0'
+    descripcion: 'Distribución de las respuestas de las empresas sobre el supuesto de precio de combustibles que usan para planificar los próximos seis meses, respecto del nivel actual (EPN, agosto 2026).'
+    filas: 6
+    bytes: 406
+destacada: false
+# 'borrador' hasta que pase el checklist de §10. 'publicada' exige etiqueta
+# completa y al menos una limitación declarada.
+estado: 'publicada'
+# Qué NO dice esta digestión. Obligatorio antes de publicar (§10).
+limitaciones:
+  - 'Esta pieza usa 2 de los cerca de 24 gráficos que el Banco Central publica junto al IPN (expectativas de inflación y expectativas de precio de combustible): es un recorte deliberado, no un resumen completo del informe, que también cubre desempeño, empleo y condiciones crediticias en detalle.'
+  - 'El IPN es un informe cualitativo y de percepciones, construido con entrevistas y dos encuestas (EPN y EDEP): las distribuciones de respuesta miden qué proporción de empresas percibe algo, no cuánto cambió realmente cada variable económica.'
+  - 'Las citas de entrevistados que aparecen en el documento original son anónimas por cargo y rubro, tal como las publica el Banco Central: no identifican personas ni empresas específicas.'
+  - 'El propio IPN aclara que las opiniones que recoge no representan la evaluación oficial del Consejo del Banco Central sobre la coyuntura económica.'
+  - 'Esta pieza no desarrolla en detalle las diferencias entre las tres macrozonas (norte, centro, sur) que el informe sí distingue por separado.'
+# Log de correcciones público, con fecha (§13). No se edita en silencio.
+correcciones: []
+---
+
+import ExpectativasInflacionScrolly from './components/ExpectativasInflacionScrolly.svelte';
+import CombustiblesDivergente from './components/CombustiblesDivergente.svelte';
+import datosInflacion from '../../../../public/data/informe-de-percepciones-de-negocios-ipn-agosto-2026/datos.json';
+import datosCombustibles from '../../../../public/data/informe-de-percepciones-de-negocios-ipn-agosto-2026/combustibles.json';
+
+## El plato de entrada
+
+¿Qué tan rápido puede cambiar de opinión una economía entera? El Informe de
+Percepciones de Negocios (IPN) del Banco Central le pregunta eso, en el
+fondo, a cientos de empresas cuatro veces al año: gerentes de comercio,
+industria, minería, banca, agro. En la edición de agosto 2026, la respuesta
+tiene una fecha bastante precisa. A comienzos de año, la inflación que las
+empresas esperaban para dentro de dos años había caído a su nivel más bajo
+desde que se mide: 3%. Después de que estallara un conflicto entre Estados
+Unidos e Irán y el petróleo se encareciera, ese número subió a 3,5% en mayo
+— y se quedó ahí en junio. Es una cifra chica, pero es la huella que dejó
+un evento internacional en el bolsillo (y en la calculadora) de las
+empresas chilenas.
+
+## La materia prima
+
+A diferencia de un boletín de cifras, este informe tiene voces: gerentes
+de comercio, minería, banca, industria de alimentos, hotelería,
+agroindustria, citados de forma anónima (por cargo y rubro, nunca por
+nombre) a lo largo de sus 36 páginas. El Banco Central de Chile construye
+el *Informe de Percepciones de Negocios* así cuatro veces al año,
+combinando entrevistas con dos encuestas online: la Encuesta de
+Percepciones de Negocios (EPN) y la Encuesta de Determinantes y
+Expectativas de Precios (EDEP). El resultado es un documento "bastante
+difícil" de leer (56 sobre 100 en nuestra medición), con 26 siglas sin
+definir la primera vez que aparecen. Sus gráficos, en el PDF, son solo
+dibujos — pero el Banco Central también publica un Excel aparte con la
+serie mensual completa detrás de cada uno, desde 2023. Entre tantas
+opiniones y tantas líneas en un gráfico, hay una que se mueve distinto a
+todas las demás: la de cuánto esperan las empresas que suba la inflación
+en dos años. Esa es la que sostiene esta pieza.
+
+## El plato de fondo
+
+Si uno pudiera ponerle un gráfico a la palabra "sobresalto", se parecería
+a este. Entre febrero y mayo de 2026, la inflación que las empresas
+esperan para dentro de dos años subió medio punto porcentual —de 3% a
+3,5%— después de tocar, en febrero, su nivel más bajo desde que existe la
+medición. La línea de 12 meses, en el mismo gráfico, se mueve todavía más:
+de 3% a 4%. Es como si el susto de corto plazo se hubiera sentido de
+inmediato, mientras la duda sobre cuánto durará el conflicto recién se
+estuviera cocinando a fuego lento en los cálculos de más largo plazo.
+
+{/* El gráfico principal va a ancho de figura, no de texto. */}
+<div class="carril-ancho">
+  <ExpectativasInflacionScrolly datos={datosInflacion.filas} client:visible />
+</div>
+
+## Los aperitivos
+
+Un par de datos más, para quien quiera mirar más de cerca. El IPN divide
+al país en tres macrozonas, y no todas ven lo mismo: en el norte, dominado
+por la minería, las empresas relatan un primer semestre flojo pero con
+expectativas "fuertemente optimistas" de mediano plazo; en el centro, más
+cauto, la mayoría espera que 2026 termine parecido a 2025. Y sobre el
+propio combustible que disparó esta historia: casi 8 de cada 10 empresas
+(78,9%) no espera que su precio baje en los próximos seis meses — la
+mayoría cree que se mantendrá igual o seguirá subiendo.
+
+{/* Gráfico de apoyo: expectativa de precio de combustibles, barras con
+    color divergente — no pictograma, para no repetir el mismo recurso
+    visual que la digestión de la encuesta de empleo. */}
+<div class="carril-ancho">
+  <CombustiblesDivergente datos={datosCombustibles.filas} client:visible />
+</div>
+
+## El postre
+
+Toda receta tiene un momento en que hay que decidir si el plato quedó bien
+o si falta corregir algo. Para las empresas chilenas, ese momento llega
+cada tres meses con un nuevo IPN. La edición de agosto muestra una
+inflación esperada a dos años que subió, pero que se estabilizó ahí — ni
+sigue disparándose ni vuelve a su mínimo de febrero. Casi 8 de cada 10
+empresas tampoco espera que el combustible, el origen de todo esto, baje
+de precio pronto. Lo que falta por ver es si el conflicto en Medio Oriente
+se resuelve antes de que esa expectativa se afirme como "la nueva
+normalidad", o si termina goteando hacia la inflación a 12 meses, que ya
+subió de 3% a 4% en el mismo período.
+
+Cómo se construyeron estos datos, con el hash y la fecha de descarga del
+documento original, está en [Método](/metodo/).
