@@ -60,13 +60,14 @@ correcciones: []
 ---
 
 import EncuestaNacionalDeEmpleoEneAbrilJunio2026 from './components/EncuestaNacionalDeEmpleoEneAbrilJunio2026.svelte';
+import TiempoParcialPictograma from './components/TiempoParcialPictograma.svelte';
 import datos from '../../../../public/data/encuesta-nacional-de-empleo-ene-abril-junio-2026/datos.json';
 
-## El gancho
+## El plato de entrada
 
 La desocupación llegó a 9,4% este trimestre, y esa va a ser la cifra del día en las noticias. Pero atrás hay otra que se mueve mucho más rápido y casi no se menciona: 647.379 personas están trabajando menos horas de las que quieren, y ese grupo creció 14,5% en solo un año — dieciséis veces más rápido que el empleo total.
 
-## El original
+## La materia prima
 
 Esta pieza digiere el *Boletín Estadístico: Empleo Trimestral*, edición n.º 333, que el Instituto Nacional de Estadísticas (INE) publicó el 31 de julio de 2026 sobre el trimestre móvil abril-junio. Son 6 páginas a dos columnas, con gráficos, tablas y notas al pie que citan fórmulas como esta, tal cual aparece en el documento:
 
@@ -74,7 +75,7 @@ Esta pieza digiere el *Boletín Estadístico: Empleo Trimestral*, edición n.º 
 
 Cuando medimos qué tan fácil es de leer este documento, el resultado fue **0 sobre 100** — el peor nivel posible en la escala que usamos, "muy difícil". Encontramos 9 siglas que el boletín usa sin explicarlas la primera vez que aparecen (SU1, SU2, SU3, TPV, TPI, NS/NR, CISE-93, CISO-18, entre otras). Y el dato que le da título a esta pieza —que 647 mil personas quieren trabajar más horas y no consiguen— no está en los recuadros destacados de la portada. Está en la página 4, en un párrafo entre notas técnicas.
 
-## La traducción
+## El plato de fondo
 
 Antes de llegar a esa cifra, el boletín cuenta otra historia: qué sectores están contratando y cuáles están despidiendo. Cuatro sectores explican casi toda la creación de empleo del año — servicios administrativos y de apoyo, actividades profesionales, transporte y salud. Comunicaciones, minería y administración pública, en cambio, perdieron trabajadores.
 
@@ -85,7 +86,7 @@ Antes de llegar a esa cifra, el boletín cuenta otra historia: qué sectores est
 
 Ningún sector por sí solo explica por qué la desocupación sigue subiendo — de hecho, el empleo total sí creció (0,9%). El problema no es que no se cree empleo: es que se crea más lento que la cantidad de gente que busca trabajo, y una porción cada vez mayor de los empleos nuevos no da las horas que la persona necesita.
 
-## La exploración
+## Los aperitivos
 
 Un par de datos más, para quien quiera mirar más de cerca:
 
@@ -93,11 +94,18 @@ Un par de datos más, para quien quiera mirar más de cerca:
 
 **Por horas trabajadas.** De las 9,4 millones de personas ocupadas, 2 millones (21,3%) trabajan tiempo parcial (1 a 30 horas semanales). De ellas, 647.379 no eligieron esa jornada: quieren trabajar más y no consiguen — es el **tiempo parcial involuntario**, y es el que creció 14,5% en el año. El tiempo parcial *voluntario*, en cambio, creció solo 3,4%: la diferencia no es menor.
 
+{/* Esta cifra es sobre personas, no sobre sectores: un pictograma la deja
+    sola en vez de diluirla en la barra de "sectores". Es una proporción, no
+    una secuencia — exploración por hover/clic en vez de scrollytelling. */}
+<div class="carril-ancho">
+  <TiempoParcialPictograma client:visible />
+</div>
+
 **Un dato raro.** Las personas que trabajan exactamente 45 horas a la semana cayeron 44% en un año. No es que esas 443.027 personas se hayan quedado sin trabajo: coincide con la reducción legal de la jornada laboral que Chile está aplicando en etapas (la "Ley 40 horas"), que corrió a mucha gente de esa categoría hacia jornadas más cortas. Vale la pena tenerlo en cuenta antes de sacar conclusiones sobre esa cifra en particular.
 
 **El indicador que junta todo.** El propio INE calcula una tasa que combina desocupación y tiempo parcial involuntario, llamada SU2. Llegó a 15,9%, subiendo 1,2 puntos porcentuales en el trimestre — más del doble de rápido que la tasa de desocupación oficial (+0,5 pp).
 
-## El cierre
+## El postre
 
 La desocupación oficial (9,4%) es la cifra que se lee en la prensa. Pero el propio INE ya construyó un indicador que cuenta una historia más completa —SU2, que suma a los desocupados quienes trabajan menos horas de las que quieren— y ese indicador subió más del doble de rápido. Es una señal de que el mercado laboral no solo tiene menos empleo: tiene empleo de peor calidad para una parte de quienes sí consiguieron trabajo.
 

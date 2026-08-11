@@ -17,6 +17,13 @@
   divergente de 7 pasos del kit (esa es para series de datos con muchas
   marcas); acá hay una sola serie y lo que se codifica es relevancia, no
   categoría, así que alcanza con mezclar los dos colores de marca.
+
+  Interacción (revisión del agente disenador-visualizaciones, §pudding.cool):
+  esta figura se publicó sin ningún handler de foco ni mouse — un SVG con
+  datos, pero nada que explorar. Se agrega tooltip accesible por teclado,
+  igual patrón que las barras de FlujoPartidas.svelte: cada sector es
+  alcanzable con Tab y el detalle exacto aparece igual con foco que con
+  cursor.
 -->
 <script lang="ts">
   import { max, min } from 'd3-array';
@@ -25,6 +32,7 @@
   import Eje from '@digerido/kit/charts/Eje.svelte';
   import Figura from '@digerido/kit/charts/Figura.svelte';
   import TablaEquivalente from '@digerido/kit/charts/TablaEquivalente.svelte';
+  import Tooltip from '@digerido/kit/charts/Tooltip.svelte';
   import { delta, numero } from '@digerido/kit/utils';
 
   interface Fila {
@@ -71,6 +79,22 @@
     const t = maxAbsoluto === 0 ? 0 : Math.abs(valor) / maxAbsoluto;
     return `color-mix(in srgb, var(--color-bilis) ${Math.round(t * 100)}%, var(--color-sello))`;
   }
+
+  // ── Estado del tooltip ────────────────────────────────────────────────────
+  let activo = $state<Fila | null>(null);
+  let posicion = $state({ x: 0, y: 0 });
+  let lienzo = $state<HTMLDivElement | null>(null);
+
+  function mostrar(d: Fila) {
+    activo = d;
+    const factor = (lienzo?.clientWidth ?? ANCHO) / ANCHO;
+    posicion = {
+      x: x(d.variacion12meses) * factor,
+      y: ((y(d.sector) ?? 0) + y.bandwidth() / 2) * factor,
+    };
+  }
+
+  const ocultar = () => (activo = null);
 </script>
 
 <Figura
@@ -80,41 +104,73 @@
   unidades={unidad}
   fuente="INE, Boletín Estadístico: Empleo Trimestral, edición n°333 (31 julio 2026)"
 >
-  <svg viewBox="0 0 {ANCHO} {ALTO}" role="img" aria-label="Comunicaciones y minería perdieron empleo; transporte y salud lo impulsaron">
-    <Eje
-      escala={x}
-      lado="abajo"
-      ancho={ANCHO}
-      alto={ALTO}
-      {margen}
-      grilla
-      formato={(v) => `${numero(v as number, 0)}%`}
-    />
-    <Eje escala={y} lado="izquierda" ancho={ANCHO} alto={ALTO} {margen} />
-
-    <line x1={cero} x2={cero} y1={margen.top} y2={ALTO - margen.bottom} class="linea-cero" />
-
-    {#each ordenados as d (d.sector)}
-      {@const desde = Math.min(cero, x(d.variacion12meses))}
-      {@const hasta = Math.max(cero, x(d.variacion12meses))}
-      <rect
-        x={desde}
-        y={y(d.sector)}
-        width={Math.max(0, hasta - desde)}
-        height={y.bandwidth()}
-        fill={colorImportancia(d.variacion12meses)}
+  <div class="lienzo" bind:this={lienzo}>
+    <svg viewBox="0 0 {ANCHO} {ALTO}" role="img" aria-label="Comunicaciones y minería perdieron empleo; transporte y salud lo impulsaron">
+      <Eje
+        escala={x}
+        lado="abajo"
+        ancho={ANCHO}
+        alto={ALTO}
+        {margen}
+        grilla
+        formato={(v) => `${numero(v as number, 0)}%`}
       />
-      <text
-        x={d.variacion12meses >= 0 ? hasta + 6 : desde - 6}
-        y={(y(d.sector) ?? 0) + y.bandwidth() / 2}
-        text-anchor={d.variacion12meses >= 0 ? 'start' : 'end'}
-        dominant-baseline="middle"
-        class="etiqueta-valor"
-      >
-        {delta(d.variacion12meses, 1, '%')}
-      </text>
-    {/each}
-  </svg>
+      <Eje escala={y} lado="izquierda" ancho={ANCHO} alto={ALTO} {margen} />
+
+      <line x1={cero} x2={cero} y1={margen.top} y2={ALTO - margen.bottom} class="linea-cero" />
+
+      {#each ordenados as d (d.sector)}
+        {@const desde = Math.min(cero, x(d.variacion12meses))}
+        {@const hasta = Math.max(cero, x(d.variacion12meses))}
+        <!--
+          `tabindex` y los handlers de foco: cada sector es alcanzable con Tab,
+          y el tooltip aparece igual que con el mouse. Sin esto, el detalle
+          exacto solo existe para quien usa puntero.
+        -->
+        <g
+          class="barra"
+          class:atenuada={activo !== null && activo.sector !== d.sector}
+          role="graphics-symbol"
+          tabindex="0"
+          aria-label="{d.sector}: {delta(d.variacion12meses, 1, ' %')} en doce meses"
+          onmouseenter={() => mostrar(d)}
+          onmouseleave={ocultar}
+          onfocus={() => mostrar(d)}
+          onblur={ocultar}
+        >
+          <rect
+            x={desde}
+            y={y(d.sector)}
+            width={Math.max(0, hasta - desde)}
+            height={y.bandwidth()}
+            fill={colorImportancia(d.variacion12meses)}
+          />
+          <text
+            x={d.variacion12meses >= 0 ? hasta + 6 : desde - 6}
+            y={(y(d.sector) ?? 0) + y.bandwidth() / 2}
+            text-anchor={d.variacion12meses >= 0 ? 'start' : 'end'}
+            dominant-baseline="middle"
+            class="etiqueta-valor"
+          >
+            {delta(d.variacion12meses, 1, '%')}
+          </text>
+        </g>
+      {/each}
+    </svg>
+
+    <Tooltip
+      visible={activo !== null}
+      x={posicion.x}
+      y={posicion.y}
+      anchoContenedor={lienzo?.clientWidth ?? 0}
+      altoContenedor={lienzo?.clientHeight ?? 0}
+    >
+      {#if activo}
+        <strong>{activo.sector}</strong><br />
+        {delta(activo.variacion12meses, 1, ' %')} en doce meses
+      {/if}
+    </Tooltip>
+  </div>
 
   {#snippet tabla()}
     <TablaEquivalente
@@ -134,6 +190,10 @@
 </Figura>
 
 <style>
+  .lienzo {
+    position: relative;
+  }
+
   .linea-cero {
     stroke: var(--color-borde-fuerte);
     stroke-width: 1;
@@ -144,5 +204,33 @@
     font-size: var(--tipo-2xs);
     font-variant-numeric: tabular-nums;
     fill: var(--color-tinta);
+  }
+
+  .barra {
+    /* La transición es de opacidad, nunca de geometría: una barra que se
+       estira al pasar el cursor impide comparar longitudes. */
+    transition: opacity var(--duracion-rapida) var(--curva-salida);
+  }
+
+  .atenuada {
+    opacity: 0.45;
+  }
+
+  .barra:focus-visible {
+    outline: none;
+  }
+
+  /* El foco se dibuja en la barra misma: el outline por defecto del
+     navegador sobre un <g> de SVG se recorta de formas impredecibles. */
+  .barra:focus-visible rect {
+    stroke: var(--color-enzima);
+    stroke-width: 3;
+    paint-order: stroke;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .barra {
+      transition: none;
+    }
   }
 </style>
