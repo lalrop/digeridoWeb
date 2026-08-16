@@ -24,6 +24,13 @@
   igual patrón que las barras de FlujoPartidas.svelte: cada sector es
   alcanzable con Tab y el detalle exacto aparece igual con foco que con
   cursor.
+
+  Momento de deleite: las barras entran una a una, en cascada, la primera
+  vez que el gráfico aparece en pantalla (acción `enVista` del kit). Es
+  progresivo: sin JS, con `prefers-reduced-motion`, o si el gráfico ya está
+  visible al cargar la página, las barras se muestran directo en su
+  posición final — la animación es una capa encima del dato correcto,
+  nunca la forma en que el dato llega a existir.
 -->
 <script lang="ts">
   import { max, min } from 'd3-array';
@@ -33,7 +40,7 @@
   import Figura from '@digerido/kit/charts/Figura.svelte';
   import TablaEquivalente from '@digerido/kit/charts/TablaEquivalente.svelte';
   import Tooltip from '@digerido/kit/charts/Tooltip.svelte';
-  import { delta, numero } from '@digerido/kit/utils';
+  import { delta, enVista, numero } from '@digerido/kit/utils';
 
   interface Fila {
     sector: string;
@@ -95,6 +102,9 @@
   }
 
   const ocultar = () => (activo = null);
+
+  // ── Momento de deleite: revelado en cascada ─────────────────────────────
+  let estadoRevelado = $state<'oculto' | 'revelado'>('revelado');
 </script>
 
 <Figura
@@ -104,7 +114,11 @@
   unidades={unidad}
   fuente="INE, Boletín Estadístico: Empleo Trimestral, edición n°333 (31 julio 2026)"
 >
-  <div class="lienzo" bind:this={lienzo}>
+  <div
+    class="lienzo"
+    bind:this={lienzo}
+    use:enVista={(estado) => (estadoRevelado = estado)}
+  >
     <svg viewBox="0 0 {ANCHO} {ALTO}" role="img" aria-label="Comunicaciones y minería perdieron empleo; transporte y salud lo impulsaron">
       <Eje
         escala={x}
@@ -119,7 +133,7 @@
 
       <line x1={cero} x2={cero} y1={margen.top} y2={ALTO - margen.bottom} class="linea-cero" />
 
-      {#each ordenados as d (d.sector)}
+      {#each ordenados as d, i (d.sector)}
         {@const desde = Math.min(cero, x(d.variacion12meses))}
         {@const hasta = Math.max(cero, x(d.variacion12meses))}
         <!--
@@ -139,6 +153,9 @@
           onblur={ocultar}
         >
           <rect
+            class="rect"
+            class:oculta={estadoRevelado === 'oculto'}
+            style="transition-delay: {i * 55}ms"
             x={desde}
             y={y(d.sector)}
             width={Math.max(0, hasta - desde)}
@@ -228,7 +245,27 @@
     paint-order: stroke;
   }
 
+  /*
+    Momento de deleite: entrada en cascada. Vive en `.rect`, no en `.barra`,
+    a propósito — la regla de arriba ("nunca de geometría" en hover) sigue
+    valiendo para el pasar el cursor; esto es una animación de una sola vez,
+    al montar el gráfico, no una respuesta a interacción continua.
+  */
+  .rect {
+    transform-box: fill-box;
+    transform-origin: center;
+    transition: transform 550ms var(--curva-salida);
+  }
+
+  .rect.oculta {
+    transform: translateY(10px) scaleY(0.82);
+  }
+
   @media (prefers-reduced-motion: reduce) {
+    .rect {
+      transition: none;
+    }
+
     .barra {
       transition: none;
     }

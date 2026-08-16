@@ -13,3 +13,5 @@ export {
   escalaCategorica, escalaDestacado, escalaSecuencial, colorDivergente,
   necesitaFilete, grafico, MAX_CATEGORICA,
 } from './escalas.js';
+
+export { enVista } from './interaccion.js';

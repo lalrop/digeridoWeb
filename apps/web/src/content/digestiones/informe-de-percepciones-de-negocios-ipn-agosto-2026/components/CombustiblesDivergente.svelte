@@ -14,6 +14,12 @@
   Es una fotografía (una distribución de respuestas a una pregunta, no una
   secuencia de momentos): hover/clic, sin scrollytelling — mismo criterio
   que en el resto de gráficos de apoyo de esta pieza.
+
+  Momento de deleite: las barras se "llenan" de izquierda a derecha la
+  primera vez que el gráfico entra en pantalla — como un medidor de
+  combustible, que es justo el tema del gráfico. Progresivo (acción
+  `enVista` del kit): sin JS, con `prefers-reduced-motion`, o si ya está
+  visible al cargar, se muestra directo en su ancho final.
 -->
 <script lang="ts">
   import { max } from 'd3-array';
@@ -24,7 +30,7 @@
   import Figura from '@digerido/kit/charts/Figura.svelte';
   import TablaEquivalente from '@digerido/kit/charts/TablaEquivalente.svelte';
   import Tooltip from '@digerido/kit/charts/Tooltip.svelte';
-  import { colorDivergente, grafico, porcentaje } from '@digerido/kit/utils';
+  import { colorDivergente, enVista, grafico, porcentaje } from '@digerido/kit/utils';
 
   interface Fila {
     categoria: string;
@@ -95,6 +101,9 @@
   }
   const ocultar = () => (activa = null);
 
+  // ── Momento de deleite: barras que se llenan como un medidor ────────────
+  let estadoRevelado = $state<'oculto' | 'revelado'>('revelado');
+
   const similar = $derived(datos.find((d) => d.categoria === 'Similar al actual'));
 
   const notaSinSupuesto = $derived(
@@ -115,7 +124,11 @@
   nota={notaSinSupuesto}
   sangria="ancho"
 >
-  <div class="lienzo" bind:this={lienzo}>
+  <div
+    class="lienzo"
+    bind:this={lienzo}
+    use:enVista={(estado) => (estadoRevelado = estado)}
+  >
     <svg
       viewBox="0 0 {ANCHO} {ALTO}"
       role="img"
@@ -124,7 +137,7 @@
       <Eje escala={x} lado="abajo" ancho={ANCHO} alto={ALTO} {margen} grilla marcas={4} formato={(v) => porcentaje(v as number, 0)} />
       <Eje escala={y} lado="izquierda" ancho={ANCHO} alto={ALTO} {margen} />
 
-      {#each datos as d (d.categoria)}
+      {#each datos as d, i (d.categoria)}
         <g
           class="barra"
           class:atenuada={activa !== null && activa.categoria !== d.categoria}
@@ -137,6 +150,9 @@
           onblur={ocultar}
         >
           <rect
+            class="rect"
+            class:oculta={estadoRevelado === 'oculto'}
+            style="transition-delay: {i * 70}ms"
             x={margen.left}
             y={y(d.categoria)}
             width={Math.max(0, x(d.porcentajeEmpresas) - margen.left)}
@@ -231,9 +247,23 @@
     font-variant-numeric: tabular-nums;
   }
 
+  /* Momento de deleite: la barra "se llena" desde el margen izquierdo, como
+     un medidor de combustible. Transform propio en `.rect` (no en `.barra`)
+     para no interferir con la transición de `fill` que ya vive ahí. */
+  .rect {
+    transform-box: fill-box;
+    transform-origin: left center;
+    transition: transform 550ms var(--curva-salida);
+  }
+
+  .rect.oculta {
+    transform: scaleX(0);
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .barra,
-    .barra rect {
+    .barra rect,
+    .rect {
       transition: none;
     }
   }
