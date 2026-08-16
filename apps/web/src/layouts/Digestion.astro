@@ -3,10 +3,13 @@
  * Shell de artículo (§10).
  *
  * Impone la estructura narrativa estándar sin obligarla: la apertura (etiqueta
- * nutricional + hallazgo) y el cierre (limitaciones, correcciones, fuentes) los
- * pone el layout, así el MDX solo contiene los pasos 1 a 5. Nadie puede
- * publicar una pieza sin método y fuentes visibles porque no están en el MDX:
- * están acá.
+ * nutricional + hallazgo) y el cierre (correcciones, fuentes) los pone el
+ * layout, así el MDX solo contiene los pasos 1 a 5. Nadie puede publicar una
+ * pieza sin método y fuentes visibles porque no están en el MDX: están acá.
+ *
+ * `limitaciones` sigue siendo obligatorio en el esquema (§10 exige declararlas
+ * antes de publicar) pero ya no se renderiza como sección propia: queda como
+ * disciplina editorial interna, no como advertencia en la página.
  */
 import type { CollectionEntry } from 'astro:content';
 
@@ -134,19 +137,6 @@ const digerido = {
     {/* ── 6. Método y fuentes: siempre visible, nunca escondido (§10) ───── */}
     <footer class="cierre">
       <div class="contenedor--angosto pila pila--lg">
-        {
-          d.limitaciones.length > 0 && (
-            <section>
-              <h2>Qué no dice esta digestión</h2>
-              <ul class="limitaciones">
-                {d.limitaciones.map((l) => (
-                  <li>{l}</li>
-                ))}
-              </ul>
-            </section>
-          )
-        }
-
         {
           d.correcciones.length > 0 && (
             <section>
@@ -299,13 +289,6 @@ const digerido = {
   .cierre h2 {
     font-size: var(--tipo-xl);
     margin-block-end: var(--espacio-md);
-  }
-
-  .limitaciones {
-    display: grid;
-    gap: var(--espacio-sm);
-    padding-inline-start: var(--espacio-lg);
-    max-width: var(--medida-angosta);
   }
 
   .correcciones {
