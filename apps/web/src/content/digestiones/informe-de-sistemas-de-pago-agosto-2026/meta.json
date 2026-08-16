@@ -1,0 +1,54 @@
+{
+  "slug": "informe-de-sistemas-de-pago-agosto-2026",
+  "generado": "2026-08-13",
+  "fuente": {
+    "url": "https://www.bcentral.cl/documents/33528/8545313/Informe+de+Sistemas+de+Pago+Agosto+2026.pdf/fd0f320e-be20-7680-a0db-511554d82029?t=1786050167608",
+    "ruta": "pipelines/informe-de-sistemas-de-pago-agosto-2026/raw/informe-sistemas-de-pago-agosto-2026.pdf",
+    "sha256": "47fcee5dade8226985becf5ccef31ca906e638e1ce624ebbb6165470be05c0d9",
+    "bytes": 6390051,
+    "fecha_descarga": "2026-08-14T00:48:31.535346+00:00",
+    "desde_cache": false
+  },
+  "etiqueta": {
+    "palabrasOriginal": 27784,
+    "siglasSinDefinir": 103,
+    "legibilidadOriginal": 45,
+    "nivelOriginal": "difícil",
+    "tiempoLecturaOriginal": 139,
+    "detalle": {
+      "indice": 45,
+      "nivel": "difícil",
+      "palabras": 27784,
+      "frases": 1061,
+      "silabas": 62583,
+      "silabasPorPalabra": 2.252,
+      "palabrasPorFrase": 26.19
+    }
+  },
+  "artefactos": [
+    {
+      "archivo": "informe-de-sistemas-de-pago-agosto-2026/datos.json",
+      "bytes": 938,
+      "filas": 15,
+      "sha256": "a24607f75e3a78da0f28a200c7ad6cc6ed2db001228f6142013528c22cf1a97d"
+    },
+    {
+      "archivo": "informe-de-sistemas-de-pago-agosto-2026/datos.csv",
+      "bytes": 397,
+      "filas": 15,
+      "sha256": "e1afb6e282b7cecf0bd16100ed5c7120642c2280359a93f65766a39acea78b00"
+    },
+    {
+      "archivo": "informe-de-sistemas-de-pago-agosto-2026/acceso-efectivo.json",
+      "bytes": 132,
+      "filas": 2,
+      "sha256": "7bcd543fe2e89f70ab3aa8452e2b395cdc87363c1c47dd38c31726a920e35e7a"
+    },
+    {
+      "archivo": "informe-de-sistemas-de-pago-agosto-2026/acceso-efectivo.csv",
+      "bytes": 58,
+      "filas": 2,
+      "sha256": "cb58f9dd228df9ef3c90ff5d2c1e4653c948d0a30271024c7a42bd20a86178f5"
+    }
+  ]
+}

@@ -1,0 +1,157 @@
+---
+titulo: 'Informe de Sistemas de Pago (ISP) agosto 2026'
+# Máximo 220 caracteres. Lo que se lee bajo el título y en los metadatos.
+bajada: 'El Banco Central revisó cómo paga Chile: cobrar una transferencia le sale carísimo a algunos comercios chicos según el proveedor que usen, y el efectivo, aunque en baja, sigue siendo indispensable en regiones y ferias.'
+# LA FRASE ÚNICA. Una sola oración, sin jerga. Si no existe, no se publica (§2).
+# El esquema rechaza más de un punto final y más de 180 caracteres.
+hallazgo: 'Aceptar un pago de $1.000 por transferencia puede costarle a un almacén hasta 42,1% de esa venta, según qué proveedor use.'
+fecha: 2026-08-14
+autores: ['digerido']
+# presupuesto · economia · salud · educacion · medioambiente · legislativo ·
+# compras-publicas · territorio
+temas: ['economia']
+# 1 = legible, 5 = ilegible. Alimenta la etiqueta nutricional.
+# legibilidadOriginal 45/100 = "difícil" en la escala Fernández-Huerta, con 103
+# siglas sin definir en 63 páginas — el más denso de los tres documentos digeridos.
+dificultadOriginal: 5
+# Minutos. El esquema exige que el digerido sea MENOR que el original.
+tiempoLectura:
+  original: 139
+  # Medido con tiempoLectura() sobre el texto final del artículo (553 palabras).
+  digerido: 3
+# Las escribe el pipeline (30_publicar.py) y se copian de pipelines/informe-de-sistemas-de-pago-agosto-2026/…/meta.json.
+# No las estimes a mano: es así como se cuela un error factual (§13).
+etiqueta:
+  palabrasOriginal: 27784
+  siglasSinDefinir: 103
+  legibilidadOriginal: 45
+  # Medido con legibilidad() sobre el texto final del artículo: 69/100, "normal".
+  legibilidadDigerido: 69
+  graficos: 2
+# Sin fuente verificable el build falla. El sha256 lo registra 00_descargar.py.
+fuentes:
+  - titulo: 'Informe de Sistemas de Pago (ISP)'
+    organismo: 'Banco Central de Chile'
+    url: 'https://www.bcentral.cl/documents/33528/8545313/Informe+de+Sistemas+de+Pago+Agosto+2026.pdf/fd0f320e-be20-7680-a0db-511554d82029?t=1786050167608'
+    fechaPublicacion: 2026-08-06
+    fechaDescarga: 2026-08-14
+    sha256: '47fcee5dade8226985becf5ccef31ca906e638e1ce624ebbb6165470be05c0d9'
+    paginas: 63
+    formato: 'pdf'
+# Publicados en /datos/ con licencia. Los produce 30_publicar.py.
+datasets:
+  - nombre: 'Costo de aceptar un pago vía TEF, por proveedor y monto'
+    archivo: 'informe-de-sistemas-de-pago-agosto-2026/datos.json'
+    licencia: 'CC BY 4.0'
+    descripcion: 'Costo directo de aceptar un pago con Transferencia Electrónica de Fondos (TEF), como % del monto, para pagos de $1.000, $20.000 y $50.000, según 5 proveedores (TABLA I.2 del Informe de Sistemas de Pago, agosto 2026).'
+    filas: 15
+    bytes: 938
+  - nombre: 'Canal principal de acceso a efectivo'
+    archivo: 'informe-de-sistemas-de-pago-agosto-2026/acceso-efectivo.json'
+    licencia: 'CC BY 4.0'
+    descripcion: '% de la población que usa cajeros automáticos o Cajas Vecinas como canal principal para obtener efectivo (ENUPE 2025, citada en el RECUADRO I.2 del Informe).'
+    filas: 2
+    bytes: 132
+destacada: false
+# 'borrador' hasta que pase el checklist de §10. 'publicada' exige etiqueta
+# completa y al menos una limitación declarada.
+estado: 'publicada'
+# Qué NO dice esta digestión. Obligatorio antes de publicar (§10).
+limitaciones:
+  - 'Esta pieza usa 2 de las decenas de datos que trae el Informe de Sistemas de Pago (el costo de aceptar TEF y el acceso a efectivo): no cubre fraude, remesas, infraestructuras de mercados financieros ni el capítulo completo sobre stablecoins, que también forman parte del documento.'
+  - 'Los gráficos del PDF son imágenes: no hubo un Excel adjunto con los datos detrás, así que los datos usados son las dos tablas que el Informe sí publica como texto (Tabla I.2 y el Recuadro I.2), transcritas y verificadas a mano contra el PDF original.'
+  - 'El Banco Central anonimiza a los 5 proveedores de la Tabla I.2 por tipo ("Iniciador de Pagos 1", "SAG 1", "Banco 1"): no identifica qué empresa real cobra cada comisión.'
+  - 'El cierre estadístico del Informe fue el 31 de marzo de 2026: las cifras pueden no reflejar cambios de precio o de mercado posteriores a esa fecha.'
+  - 'La caída del retiro de efectivo en cajeros (de 14,6% a 6,1% del PIB entre 2019 y 2025, citada en el texto) no está en el dataset publicado: el Informe la menciona en el cuerpo del texto, pero el gráfico que la muestra es una imagen sin serie de datos detrás.'
+# Log de correcciones público, con fecha (§13). No se edita en silencio.
+correcciones: []
+---
+
+import CostoTefScrolly from './components/CostoTefScrolly.svelte';
+import AccesoEfectivo from './components/AccesoEfectivo.svelte';
+import EfectivoRetiroPib from './components/EfectivoRetiroPib.svelte';
+import datosCostoTef from '../../../../public/data/informe-de-sistemas-de-pago-agosto-2026/datos.json';
+import datosAccesoEfectivo from '../../../../public/data/informe-de-sistemas-de-pago-agosto-2026/acceso-efectivo.json';
+
+## El plato de entrada
+
+¿Por qué a veces pagar con la aplicación del banco sale más caro para el
+almacén que pagar en efectivo? El Informe de Sistemas de Pago del Banco
+Central tiene una respuesta incómoda: depende del proveedor. Aceptar una
+transferencia de $1.000 le cuesta a un comercio 42,1% de esa venta con el
+proveedor más caro de los cinco que revisó el Banco Central, y apenas 1%
+con el más barato. Nadie le avisa al almacén cuál eligió.
+
+## La materia prima
+
+El Informe de Sistemas de Pago es el documento con el que el Banco Central
+de Chile rinde cuentas, una vez al año, de cómo funcionan los pagos en el
+país. Esta edición tiene 63 páginas y, según nuestra medición, es "difícil"
+de leer (45 sobre 100 en la escala Fernández-Huerta): usa 103 siglas sin
+definir la primera vez que aparecen, entre ellas TEF (Transferencia
+Electrónica de Fondos), IMF (Infraestructuras del Mercado Financiero) y CMF
+(Comisión para el Mercado Financiero). Sus gráficos son solo dibujos en el
+PDF: el Banco Central no publicó un Excel aparte esta vez, así que los
+datos de esta pieza salen de las dos tablas que el Informe sí trae en
+formato texto.
+
+## El plato de fondo
+
+Es como comparar el precio del pan en cinco panaderías del mismo barrio:
+todas cobran más caro la marraqueta suelta que el pan por kilo, pero una de
+ellas cobra literalmente 40 veces más por unidad que las demás. Eso es lo
+que muestra la Tabla I.2 del Informe: cinco proveedores de pagos por
+transferencia (TEF), comparados en tres montos ($1.000, $20.000 y $50.000).
+Todos cobran más, en proporción, por los pagos chicos —tiene sentido, hay
+un costo fijo detrás de cada transacción—. Lo que no tiene una explicación
+tan simple es que el más caro cobre 42,1% en un pago de $1.000 mientras el
+más barato cobra 1% sin importar el monto. Desplazate por el gráfico para
+ver cómo se acerca la brecha a medida que el pago crece.
+
+{/* El gráfico principal va a ancho de figura, no de texto. */}
+<div class="carril-ancho">
+  <CostoTefScrolly datos={datosCostoTef.filas} client:visible />
+</div>
+
+## Los aperitivos
+
+El costo de aceptar pagos digitales no es el único tema del Informe:
+también importa cómo sigue moviéndose el efectivo. Y ahí los retiros en
+cajero cuentan una historia clara:
+
+{/* Comparador tipográfico: no es un "gráfico" (2 cifras citadas del cuerpo
+    del Informe, sin dataset propio detrás — ver limitaciones). */}
+<EfectivoRetiroPib
+  desde={{ anio: 2019, valor: 14.6 }}
+  hasta={{ anio: 2025, valor: 6.1 }}
+  unidad="Retiros de efectivo en cajero automático, % del PIB"
+/>
+
+Menos de la mitad en seis años. Con todo, el efectivo no desapareció: hay
+un personaje secundario en esta historia, la Caja Vecina, ese mostrador
+dentro de un almacén o botillería donde también se puede sacar plata. El
+Informe cuenta que un 47% de la población ya la usa como canal principal
+de acceso a efectivo, cerca de la mitad de quienes usan cajeros
+automáticos (77%). No reemplaza al cajero —tiene montos máximos por
+transacción y depende de que el comercio tenga plata disponible—, pero
+amplía la cobertura en zonas con menos bancos. Tiene sentido: alguien
+tiene que seguir entregando esos billetes en el resto del país.
+
+{/* Gráfico de apoyo: canal principal de acceso a efectivo. */}
+<div class="carril-ancho">
+  <AccesoEfectivo datos={datosAccesoEfectivo.filas} client:visible />
+</div>
+
+## El postre
+
+Volvamos al almacén del principio. La persona que lo atiende probablemente
+no eligió su proveedor de pagos comparando tablas del Banco Central —eligió
+el que le ofreció instalar alguien, o el que ya traía el POS que le
+prestaron—. El Informe de Sistemas de Pago no la culpa: muestra un mercado
+donde el costo de aceptar plata digital varía 40 veces entre opciones, sin
+que eso sea obvio para quien decide. Mientras tanto, el efectivo —aunque
+cada vez menos, de 14,6% a 6,1% del PIB en seis años— sigue ahí como red de
+respaldo, sobre todo donde ese vendedor no tiene forma de comparar.
+
+Cómo se construyeron estos datos, con el hash y la fecha de descarga del
+documento original, está en [Método](/metodo/).
