@@ -22,7 +22,7 @@
   import Figura from '@digerido/kit/charts/Figura.svelte';
   import TablaEquivalente from '@digerido/kit/charts/TablaEquivalente.svelte';
   import Tooltip from '@digerido/kit/charts/Tooltip.svelte';
-  import { delta, formatoCLP, grafico, numero } from '@digerido/kit/utils';
+  import { delta, formatoCLP, grafico, numero, observarAncho } from '@digerido/kit/utils';
 
   interface Partida {
     partida: string;
@@ -107,9 +107,15 @@
    */
   let lienzo = $state<HTMLDivElement | null>(null);
 
+  // Ancho real del contenedor, medido en vivo: alimenta el factor de posición
+  // del tooltip y el de compensación de texto de Eje/Anotacion/`.valor`
+  // (§ "el SVG se encoge en móvil").
+  let anchoLienzo = $state(ANCHO);
+  const factorTexto = $derived(ANCHO / Math.max(1, anchoLienzo));
+
   function mostrar(d: Partida) {
     activa = d;
-    const factor = (lienzo?.clientWidth ?? ANCHO) / ANCHO;
+    const factor = anchoLienzo / ANCHO;
     posicion = {
       x: x(d.monto) * factor,
       y: ((y(d.partida) ?? 0) + y.bandwidth() / 2) * factor,
@@ -130,7 +136,7 @@
   bajada="Monto asignado por partida. La variación respecto del año anterior aparece al costado de cada barra."
   nota="Cifras sintéticas: esta figura existe para demostrar el patrón de gráfico, no para informar sobre presupuesto alguno."
 >
-  <div class="lienzo" bind:this={lienzo}>
+  <div class="lienzo" bind:this={lienzo} use:observarAncho={(a) => (anchoLienzo = a)}>
     <!--
       `role="img"` con el hallazgo como aria-label (§8). Un lector de pantalla
       recibe la conclusión, no una descripción del tipo de gráfico.
@@ -149,10 +155,13 @@
         grilla
         marcas={5}
         formato={(v) => numero(v as number)}
+        factor={factorTexto}
       />
-      <Eje escala={y} lado="izquierda" ancho={ANCHO} alto={ALTO} {margen} />
+      <Eje escala={y} lado="izquierda" ancho={ANCHO} alto={ALTO} {margen} factor={factorTexto} />
 
       {#each datos as d (d.partida)}
+        {@const valorX = x(d.monto) + 8}
+        {@const valorY = (y(d.partida) ?? 0) + y.bandwidth() / 2}
         <!--
           `tabindex` y los handlers de foco: cada barra es alcanzable con Tab, y
           el tooltip aparece igual que con el mouse. Sin esto, el detalle solo
@@ -182,14 +191,17 @@
           />
 
           <!-- Etiqueta directa al final de la barra: en §8, "forma, posición o
-               etiqueta directa como respaldo" del color, nunca solo color. -->
-          <text
-            class="valor"
-            class:negativa={d.variacion < 0}
-            x={x(d.monto) + 8}
-            y={(y(d.partida) ?? 0) + y.bandwidth() / 2}
-            dominant-baseline="middle">{delta(d.variacion, 1, ' %')}</text
-          >
+               etiqueta directa como respaldo" del color, nunca solo color.
+               Compensación de escala: ver Eje.svelte/Anotacion.svelte. -->
+          <g transform="translate({valorX} {valorY}) scale({factorTexto}) translate({-valorX} {-valorY})">
+            <text
+              class="valor"
+              class:negativa={d.variacion < 0}
+              x={valorX}
+              y={valorY}
+              dominant-baseline="middle">{delta(d.variacion, 1, ' %')}</text
+            >
+          </g>
         </g>
       {/each}
 
@@ -203,6 +215,7 @@
           ancho={150}
           texto="Tres veces el aumento de Educación"
           enfasis
+          factor={factorTexto}
         />
       {/if}
     </svg>

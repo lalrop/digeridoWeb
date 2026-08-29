@@ -29,11 +29,20 @@
     enfasis?: boolean;
     /** Alineación del texto respecto del ancla. */
     alinear?: 'inicio' | 'fin' | 'centro';
+    /**
+     * Compensación de escala: `ANCHO_VIEWBOX / anchoReal`, medida con
+     * `observarAncho` en el gráfico dueño de esta anotación. Sin esto, el
+     * texto —que en una anotación ES el hallazgo, no un detalle— se encoge
+     * junto con el SVG en pantallas angostas (ver
+     * `packages/kit/src/utils/redimension.ts`). Por defecto 1: sin medición,
+     * la anotación se comporta como siempre.
+     */
+    factor?: number;
   }
 
   let {
     x, y, texto, dx = 16, dy = -28, ancho = 180,
-    conector = 'linea', punto = true, enfasis = false, alinear = 'inicio',
+    conector = 'linea', punto = true, enfasis = false, alinear = 'inicio', factor = 1,
   }: Props = $props();
 
   const INTERLINEA = 15;
@@ -65,6 +74,10 @@
   /** El conector termina en el borde de la etiqueta, no en su centro. */
   const finX = $derived(x + dx - (alinear === 'fin' ? -4 : alinear === 'centro' ? 0 : 4));
   const finY = $derived(y + dy + (dy < 0 ? 4 : -4));
+
+  /** Punto de anclaje del texto: también el centro de la compensación de escala. */
+  const anclaX = $derived(x + dx);
+  const anclaY = $derived(y + dy);
 </script>
 
 <g class="anotacion" class:anotacion--enfasis={enfasis}>
@@ -76,16 +89,24 @@
     <circle class="punto" cx={x} cy={y} r="3.5" />
   {/if}
 
-  <text x={x + dx} y={y + dy} text-anchor={anclaTexto}>
-    {#each lineas as linea, i (i)}
-      <!--
-        `paint-order: stroke` pinta un halo del color del papel detrás de las
-        letras: la anotación queda legible incluso encima de una marca oscura,
-        sin caja rectangular que tape los datos.
-      -->
-      <tspan x={x + dx} dy={i === 0 ? 0 : INTERLINEA}>{linea}</tspan>
-    {/each}
-  </text>
+  <!--
+    `<g>` de compensación: traslada al punto de anclaje del texto, escala ahí
+    mismo y traslada de vuelta. El bloque completo —tamaño de letra, interlínea
+    de los `tspan`, halo del `stroke`— queda a su tamaño real en pantalla sin
+    moverse del punto que anota (ver prop `factor`).
+  -->
+  <g transform="translate({anclaX} {anclaY}) scale({factor}) translate({-anclaX} {-anclaY})">
+    <text x={anclaX} y={anclaY} text-anchor={anclaTexto}>
+      {#each lineas as linea, i (i)}
+        <!--
+          `paint-order: stroke` pinta un halo del color del papel detrás de las
+          letras: la anotación queda legible incluso encima de una marca oscura,
+          sin caja rectangular que tape los datos.
+        -->
+        <tspan x={anclaX} dy={i === 0 ? 0 : INTERLINEA}>{linea}</tspan>
+      {/each}
+    </text>
+  </g>
 </g>
 
 <style>

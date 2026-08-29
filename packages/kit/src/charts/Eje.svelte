@@ -37,11 +37,20 @@
     formato?: (valor: never) => string;
     /** Oculta marcas cuando no caben (ejes de categoría densos). */
     saltar?: number;
+    /**
+     * Compensación de escala: `ANCHO_VIEWBOX / anchoReal`, medida con
+     * `observarAncho` en el gráfico que usa este eje. El SVG entero se encoge
+     * con `width: 100%` cuando el contenedor es más angosto que el viewBox —
+     * sin esto, el texto de las marcas se encoge junto con el dibujo y en un
+     * celular queda ilegible (ver `packages/kit/src/utils/redimension.ts`).
+     * Por defecto 1: sin medición, el eje se comporta como siempre.
+     */
+    factor?: number;
   }
 
   let {
     escala, lado, ancho, alto, margen,
-    rotulo, marcas = 5, grilla = false, formato, saltar = 1,
+    rotulo, marcas = 5, grilla = false, formato, saltar = 1, factor = 1,
   }: Props = $props();
 
   const horizontal = $derived(lado === 'abajo' || lado === 'arriba');
@@ -92,17 +101,30 @@
   <g class="marcas">
     {#each valores as v (String(v))}
       {#if horizontal}
-        <text
-          x={posicion(v)}
-          y={lado === 'abajo' ? linea + 18 : linea - 10}
-          text-anchor="middle"
-          dominant-baseline={lado === 'abajo' ? 'hanging' : 'auto'}>{etiqueta(v)}</text>
+        {@const px = posicion(v)}
+        {@const py = lado === 'abajo' ? linea + 18 : linea - 10}
+        <!--
+          El `<g>` de compensación traslada al punto de anclaje, escala ahí
+          mismo y traslada de vuelta: el texto queda del mismo tamaño real en
+          pantalla sin moverse de la marca que etiqueta (ver prop `factor`).
+        -->
+        <g transform="translate({px} {py}) scale({factor}) translate({-px} {-py})">
+          <text
+            x={px}
+            y={py}
+            text-anchor="middle"
+            dominant-baseline={lado === 'abajo' ? 'hanging' : 'auto'}>{etiqueta(v)}</text>
+        </g>
       {:else}
-        <text
-          x={lado === 'izquierda' ? linea - 10 : linea + 10}
-          y={posicion(v)}
-          text-anchor={lado === 'izquierda' ? 'end' : 'start'}
-          dominant-baseline="middle">{etiqueta(v)}</text>
+        {@const px = lado === 'izquierda' ? linea - 10 : linea + 10}
+        {@const py = posicion(v)}
+        <g transform="translate({px} {py}) scale({factor}) translate({-px} {-py})">
+          <text
+            x={px}
+            y={py}
+            text-anchor={lado === 'izquierda' ? 'end' : 'start'}
+            dominant-baseline="middle">{etiqueta(v)}</text>
+        </g>
       {/if}
     {/each}
   </g>
@@ -114,13 +136,17 @@
       girar la cabeza para encontrarlo.
     -->
     {#if horizontal}
-      <text
-        class="rotulo"
-        x={margen.left}
-        y={lado === 'abajo' ? alto - 4 : 12}
-        text-anchor="start">{rotulo}</text>
+      {@const rx = margen.left}
+      {@const ry = lado === 'abajo' ? alto - 4 : 12}
+      <g transform="translate({rx} {ry}) scale({factor}) translate({-rx} {-ry})">
+        <text class="rotulo" x={rx} y={ry} text-anchor="start">{rotulo}</text>
+      </g>
     {:else}
-      <text class="rotulo" x={margen.left} y={margen.top - 12} text-anchor="start">{rotulo}</text>
+      {@const rx = margen.left}
+      {@const ry = margen.top - 12}
+      <g transform="translate({rx} {ry}) scale({factor}) translate({-rx} {-ry})">
+        <text class="rotulo" x={rx} y={ry} text-anchor="start">{rotulo}</text>
+      </g>
     {/if}
   {/if}
 </g>

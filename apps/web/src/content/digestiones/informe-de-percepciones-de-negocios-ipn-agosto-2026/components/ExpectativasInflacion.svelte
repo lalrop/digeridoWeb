@@ -21,7 +21,7 @@
   import Figura from '@digerido/kit/charts/Figura.svelte';
   import TablaEquivalente from '@digerido/kit/charts/TablaEquivalente.svelte';
   import Tooltip from '@digerido/kit/charts/Tooltip.svelte';
-  import { formatoMesAno, grafico, numero, porcentaje } from '@digerido/kit/utils';
+  import { formatoMesAno, grafico, numero, observarAncho, porcentaje } from '@digerido/kit/utils';
 
   interface Fila {
     horizonte: '12 meses' | '24 meses';
@@ -98,12 +98,24 @@
   }
   const ocultar = () => (activo = null);
 
-  const factor = $derived((lienzo?.clientWidth ?? ANCHO) / ANCHO);
+  // Ancho real del contenedor, medido en vivo: alimenta el factor de posición
+  // del tooltip y el de compensación de texto de Eje/Anotacion/las etiquetas
+  // de serie (§ "el SVG se encoge en móvil").
+  let anchoLienzo = $state(ANCHO);
+  const factor = $derived(anchoLienzo / ANCHO);
+  const factorTexto = $derived(ANCHO / Math.max(1, anchoLienzo));
   const posicion = $derived(
     activo
       ? { x: x(parsePeriodo(activo.periodo)) * factor, y: y(activo.mediana) * factor }
       : { x: 0, y: 0 },
   );
+
+  // Posición de las etiquetas de serie ("12 meses"/"24 meses"), al final de
+  // cada línea. Derivadas acá (no `{@const}` en el markup) porque las usa a
+  // la vez el `<g>` de compensación de escala y el `<text>` que envuelve.
+  const etiquetaX = $derived(ANCHO - margen.right + 6);
+  const etiqueta12 = $derived({ x: etiquetaX, y: y(serie12.at(-1)?.mediana ?? 0) });
+  const etiqueta24 = $derived({ x: etiquetaX, y: y(serie24.at(-1)?.mediana ?? 0) });
 </script>
 
 <Figura
@@ -114,33 +126,39 @@
   fuente="Banco Central de Chile, Encuesta de Determinantes y Expectativas de Precios (EDEP), Excel adjunto al IPN de agosto 2026"
   sangria="ancho"
 >
-  <div class="lienzo" bind:this={lienzo}>
+  <div class="lienzo" bind:this={lienzo} use:observarAncho={(a) => (anchoLienzo = a)}>
     <svg
       viewBox="0 0 {ANCHO} {ALTO}"
       role="img"
       aria-label="La mediana de expectativas de inflación a 24 meses tocó su mínimo histórico (3%) en febrero de 2026 y subió a 3,5% en mayo, repitiéndose en junio"
     >
-      <Eje escala={y} lado="izquierda" ancho={ANCHO} alto={ALTO} {margen} grilla marcas={4} formato={(v) => porcentaje(v as number, 0)} />
-      <Eje escala={x} lado="abajo" ancho={ANCHO} alto={ALTO} {margen} marcas={4} />
+      <Eje escala={y} lado="izquierda" ancho={ANCHO} alto={ALTO} {margen} grilla marcas={4} formato={(v) => porcentaje(v as number, 0)} factor={factorTexto} />
+      <Eje escala={x} lado="abajo" ancho={ANCHO} alto={ALTO} {margen} marcas={4} factor={factorTexto} />
 
       <!-- Serie de contexto: 12 meses. Sin marcadores por punto (§ arriba). -->
       <path d={trazo12} class="linea linea--contexto" />
-      <text
-        class="etiqueta-linea"
-        x={ANCHO - margen.right + 6}
-        y={y(serie12.at(-1)?.mediana ?? 0)}
-        dominant-baseline="middle">12 meses</text
+      <!-- Compensación de escala: ver Eje.svelte/Anotacion.svelte, mismo patrón. -->
+      <g
+        transform="translate({etiqueta12.x} {etiqueta12.y}) scale({factorTexto}) translate({-etiqueta12.x} {-etiqueta12.y})"
       >
+        <text class="etiqueta-linea" x={etiqueta12.x} y={etiqueta12.y} dominant-baseline="middle"
+          >12 meses</text
+        >
+      </g>
 
       <!-- Serie destacada: 24 meses — la del hallazgo. -->
       <path d={trazo24} class="linea linea--destacada" style:stroke={colorDestacado} />
-      <text
-        class="etiqueta-linea etiqueta-linea--destacada"
-        x={ANCHO - margen.right + 6}
-        y={y(serie24.at(-1)?.mediana ?? 0)}
-        dominant-baseline="middle"
-        style:fill={colorDestacado}>24 meses</text
+      <g
+        transform="translate({etiqueta24.x} {etiqueta24.y}) scale({factorTexto}) translate({-etiqueta24.x} {-etiqueta24.y})"
       >
+        <text
+          class="etiqueta-linea etiqueta-linea--destacada"
+          x={etiqueta24.x}
+          y={etiqueta24.y}
+          dominant-baseline="middle"
+          style:fill={colorDestacado}>24 meses</text
+        >
+      </g>
 
       {#each serie24 as d (d.periodo)}
         <g
@@ -171,6 +189,7 @@
           ancho={140}
           alinear="fin"
           texto="Mínimo histórico: {numero(minimo24.mediana, 0)}% (feb. 2026)"
+          factor={factorTexto}
         />
       {/if}
 
@@ -183,6 +202,7 @@
           ancho={150}
           texto="Repunte a 3,5% tras el shock de costos"
           enfasis
+          factor={factorTexto}
         />
       {/if}
     </svg>

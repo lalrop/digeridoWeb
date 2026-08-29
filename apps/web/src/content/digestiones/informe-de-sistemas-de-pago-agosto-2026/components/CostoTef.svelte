@@ -25,7 +25,7 @@
   import Figura from '@digerido/kit/charts/Figura.svelte';
   import TablaEquivalente from '@digerido/kit/charts/TablaEquivalente.svelte';
   import Tooltip from '@digerido/kit/charts/Tooltip.svelte';
-  import { formatoCLP, grafico, porcentaje } from '@digerido/kit/utils';
+  import { formatoCLP, grafico, observarAncho, porcentaje } from '@digerido/kit/utils';
 
   interface Fila {
     entidad: string;
@@ -94,7 +94,12 @@
   }
   const ocultar = () => (activo = null);
 
-  const factor = $derived((lienzo?.clientWidth ?? ANCHO) / ANCHO);
+  // Ancho real del contenedor, medido en vivo (reacciona a resize/orientación):
+  // de acá salen el factor de posición del tooltip y el de compensación de
+  // texto que reciben Eje y Anotacion (§ "el SVG se encoge en móvil").
+  let anchoLienzo = $state(ANCHO);
+  const factor = $derived(anchoLienzo / ANCHO);
+  const factorTexto = $derived(ANCHO / Math.max(1, anchoLienzo));
   const posicionTooltip = $derived(
     activo ? { x: (x(activo.monto) ?? 0) * factor, y: y(activo.porcentaje) * factor } : { x: 0, y: 0 },
   );
@@ -108,14 +113,14 @@
   fuente="Banco Central de Chile, Informe de Sistemas de Pago, agosto 2026 (Tabla I.2)"
   sangria="ancho"
 >
-  <div class="lienzo" bind:this={lienzo}>
+  <div class="lienzo" bind:this={lienzo} use:observarAncho={(a) => (anchoLienzo = a)}>
     <svg
       viewBox="0 0 {ANCHO} {ALTO}"
       role="img"
       aria-label="Aceptar un pago de $1.000 por transferencia cuesta 42,1% del monto con Iniciador de Pagos 1, muy por encima del 1% que cobra Banco 1; con pagos de $50.000 la diferencia entre proveedores casi desaparece"
     >
-      <Eje escala={y} lado="izquierda" ancho={ANCHO} alto={ALTO} {margen} grilla marcas={5} formato={(v) => porcentaje(v as number, 0)} />
-      <Eje escala={x} lado="abajo" ancho={ANCHO} alto={ALTO} {margen} formato={(v) => formatoCLP(v as number)} />
+      <Eje escala={y} lado="izquierda" ancho={ANCHO} alto={ALTO} {margen} grilla marcas={5} formato={(v) => porcentaje(v as number, 0)} factor={factorTexto} />
+      <Eje escala={x} lado="abajo" ancho={ANCHO} alto={ALTO} {margen} formato={(v) => formatoCLP(v as number)} factor={factorTexto} />
 
       {#each entidades as entidad (entidad)}
         {@const serie = serieDe(entidad)}
@@ -156,6 +161,7 @@
           ancho={150}
           texto="42,1% de la venta se va en la comisión"
           enfasis
+          factor={factorTexto}
         />
       {/if}
 
@@ -168,6 +174,7 @@
           ancho={140}
           alinear="fin"
           texto="Banco 1 cobra siempre 1%, sin importar el monto"
+          factor={factorTexto}
         />
       {/if}
     </svg>

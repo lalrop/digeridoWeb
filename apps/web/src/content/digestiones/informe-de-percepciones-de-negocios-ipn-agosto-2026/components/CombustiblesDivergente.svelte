@@ -30,7 +30,7 @@
   import Figura from '@digerido/kit/charts/Figura.svelte';
   import TablaEquivalente from '@digerido/kit/charts/TablaEquivalente.svelte';
   import Tooltip from '@digerido/kit/charts/Tooltip.svelte';
-  import { colorDivergente, enVista, grafico, porcentaje } from '@digerido/kit/utils';
+  import { colorDivergente, enVista, grafico, observarAncho, porcentaje } from '@digerido/kit/utils';
 
   interface Fila {
     categoria: string;
@@ -91,9 +91,15 @@
   let posicionTooltip = $state({ x: 0, y: 0 });
   let lienzo = $state<HTMLDivElement | null>(null);
 
+  // Ancho real del contenedor, medido en vivo: alimenta el factor de posición
+  // del tooltip y el de compensación de texto de Eje/Anotacion/`.valor`
+  // (§ "el SVG se encoge en móvil").
+  let anchoLienzo = $state(ANCHO);
+  const factorTexto = $derived(ANCHO / Math.max(1, anchoLienzo));
+
   function mostrar(d: Fila) {
     activa = d;
-    const factor = (lienzo?.clientWidth ?? ANCHO) / ANCHO;
+    const factor = anchoLienzo / ANCHO;
     posicionTooltip = {
       x: x(d.porcentajeEmpresas) * factor,
       y: ((y(d.categoria) ?? 0) + y.bandwidth() / 2) * factor,
@@ -128,16 +134,19 @@
     class="lienzo"
     bind:this={lienzo}
     use:enVista={(estado) => (estadoRevelado = estado)}
+    use:observarAncho={(a) => (anchoLienzo = a)}
   >
     <svg
       viewBox="0 0 {ANCHO} {ALTO}"
       role="img"
       aria-label="El 78,9% de las empresas espera que el precio del combustible se mantenga igual o suba en los próximos seis meses"
     >
-      <Eje escala={x} lado="abajo" ancho={ANCHO} alto={ALTO} {margen} grilla marcas={4} formato={(v) => porcentaje(v as number, 0)} />
-      <Eje escala={y} lado="izquierda" ancho={ANCHO} alto={ALTO} {margen} />
+      <Eje escala={x} lado="abajo" ancho={ANCHO} alto={ALTO} {margen} grilla marcas={4} formato={(v) => porcentaje(v as number, 0)} factor={factorTexto} />
+      <Eje escala={y} lado="izquierda" ancho={ANCHO} alto={ALTO} {margen} factor={factorTexto} />
 
       {#each datos as d, i (d.categoria)}
+        {@const valorX = x(d.porcentajeEmpresas) + 8}
+        {@const valorY = (y(d.categoria) ?? 0) + y.bandwidth() / 2}
         <g
           class="barra"
           class:atenuada={activa !== null && activa.categoria !== d.categoria}
@@ -159,12 +168,12 @@
             height={y.bandwidth()}
             fill={color(d.categoria)}
           />
-          <text
-            class="valor"
-            x={x(d.porcentajeEmpresas) + 8}
-            y={(y(d.categoria) ?? 0) + y.bandwidth() / 2}
-            dominant-baseline="middle">{porcentaje(d.porcentajeEmpresas)}</text
-          >
+          <!-- Compensación de escala: ver Eje.svelte/Anotacion.svelte, mismo patrón. -->
+          <g transform="translate({valorX} {valorY}) scale({factorTexto}) translate({-valorX} {-valorY})">
+            <text class="valor" x={valorX} y={valorY} dominant-baseline="middle"
+              >{porcentaje(d.porcentajeEmpresas)}</text
+            >
+          </g>
         </g>
       {/each}
 
@@ -178,6 +187,7 @@
           alinear="fin"
           texto="78,9% cree que no bajará: similar o más caro"
           enfasis
+          factor={factorTexto}
         />
       {/if}
     </svg>

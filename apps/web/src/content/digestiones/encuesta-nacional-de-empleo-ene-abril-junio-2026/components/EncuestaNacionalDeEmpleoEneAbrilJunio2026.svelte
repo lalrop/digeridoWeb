@@ -40,7 +40,7 @@
   import Figura from '@digerido/kit/charts/Figura.svelte';
   import TablaEquivalente from '@digerido/kit/charts/TablaEquivalente.svelte';
   import Tooltip from '@digerido/kit/charts/Tooltip.svelte';
-  import { delta, enVista, numero } from '@digerido/kit/utils';
+  import { delta, enVista, numero, observarAncho } from '@digerido/kit/utils';
 
   interface Fila {
     sector: string;
@@ -92,9 +92,15 @@
   let posicion = $state({ x: 0, y: 0 });
   let lienzo = $state<HTMLDivElement | null>(null);
 
+  // Ancho real del contenedor, medido en vivo: alimenta el factor de posición
+  // del tooltip y el de compensación de texto de Eje/`.etiqueta-valor`
+  // (§ "el SVG se encoge en móvil").
+  let anchoLienzo = $state(ANCHO);
+  const factorTexto = $derived(ANCHO / Math.max(1, anchoLienzo));
+
   function mostrar(d: Fila) {
     activo = d;
-    const factor = (lienzo?.clientWidth ?? ANCHO) / ANCHO;
+    const factor = anchoLienzo / ANCHO;
     posicion = {
       x: x(d.variacion12meses) * factor,
       y: ((y(d.sector) ?? 0) + y.bandwidth() / 2) * factor,
@@ -118,6 +124,7 @@
     class="lienzo"
     bind:this={lienzo}
     use:enVista={(estado) => (estadoRevelado = estado)}
+    use:observarAncho={(a) => (anchoLienzo = a)}
   >
     <svg viewBox="0 0 {ANCHO} {ALTO}" role="img" aria-label="Comunicaciones y minería perdieron empleo; transporte y salud lo impulsaron">
       <Eje
@@ -128,14 +135,17 @@
         {margen}
         grilla
         formato={(v) => `${numero(v as number, 0)}%`}
+        factor={factorTexto}
       />
-      <Eje escala={y} lado="izquierda" ancho={ANCHO} alto={ALTO} {margen} />
+      <Eje escala={y} lado="izquierda" ancho={ANCHO} alto={ALTO} {margen} factor={factorTexto} />
 
       <line x1={cero} x2={cero} y1={margen.top} y2={ALTO - margen.bottom} class="linea-cero" />
 
       {#each ordenados as d, i (d.sector)}
         {@const desde = Math.min(cero, x(d.variacion12meses))}
         {@const hasta = Math.max(cero, x(d.variacion12meses))}
+        {@const valorX = d.variacion12meses >= 0 ? hasta + 6 : desde - 6}
+        {@const valorY = (y(d.sector) ?? 0) + y.bandwidth() / 2}
         <!--
           `tabindex` y los handlers de foco: cada sector es alcanzable con Tab,
           y el tooltip aparece igual que con el mouse. Sin esto, el detalle
@@ -162,15 +172,18 @@
             height={y.bandwidth()}
             fill={colorImportancia(d.variacion12meses)}
           />
-          <text
-            x={d.variacion12meses >= 0 ? hasta + 6 : desde - 6}
-            y={(y(d.sector) ?? 0) + y.bandwidth() / 2}
-            text-anchor={d.variacion12meses >= 0 ? 'start' : 'end'}
-            dominant-baseline="middle"
-            class="etiqueta-valor"
-          >
-            {delta(d.variacion12meses, 1, '%')}
-          </text>
+          <!-- Compensación de escala: ver Eje.svelte/Anotacion.svelte, mismo patrón. -->
+          <g transform="translate({valorX} {valorY}) scale({factorTexto}) translate({-valorX} {-valorY})">
+            <text
+              x={valorX}
+              y={valorY}
+              text-anchor={d.variacion12meses >= 0 ? 'start' : 'end'}
+              dominant-baseline="middle"
+              class="etiqueta-valor"
+            >
+              {delta(d.variacion12meses, 1, '%')}
+            </text>
+          </g>
         </g>
       {/each}
     </svg>
