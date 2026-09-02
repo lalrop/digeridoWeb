@@ -1,0 +1,42 @@
+{
+  "slug": "encuesta-nacional-de-empleo-mayo-julio-2026",
+  "generado": "2026-09-01",
+  "fuente": {
+    "url": "https://www.ine.gob.cl/docs/default-source/ocupacion-y-desocupacion/boletines/2026/nacional/ene-nacional-334.pdf",
+    "ruta": "C:\\Users\\lrodr\\Desarrollos\\Digerido\\pipelines\\encuesta-nacional-de-empleo-mayo-julio-2026\\raw\\ene-nacional-334.pdf",
+    "sha256": "4b8aa4f9ce8d9b80ca0d1b02dc0f963240e0b58f2abaf095c67b06dde3fe5148",
+    "bytes": 2916440,
+    "fecha_descarga": "2026-09-01T18:28:33.273094+00:00",
+    "desde_cache": true
+  },
+  "etiqueta": {
+    "palabrasOriginal": 1955,
+    "siglasSinDefinir": 9,
+    "legibilidadOriginal": 0,
+    "nivelOriginal": "muy difícil",
+    "tiempoLecturaOriginal": 10,
+    "detalle": {
+      "indice": 0,
+      "nivel": "muy difícil",
+      "palabras": 1955,
+      "frases": 123,
+      "silabas": 6220,
+      "silabasPorPalabra": 3.182,
+      "palabrasPorFrase": 15.89
+    }
+  },
+  "artefactos": [
+    {
+      "archivo": "encuesta-nacional-de-empleo-mayo-julio-2026/datos.json",
+      "bytes": 460,
+      "filas": 7,
+      "sha256": "ceaa42893f8210164a78bfc5171901233441cf6a68d87d19e98b84d084cfe379"
+    },
+    {
+      "archivo": "encuesta-nacional-de-empleo-mayo-julio-2026/datos.csv",
+      "bytes": 214,
+      "filas": 7,
+      "sha256": "586f5e41c2555471c577358589fffed3114c5d9d4b53ed75fc8e7bd27f3f5471"
+    }
+  ]
+}

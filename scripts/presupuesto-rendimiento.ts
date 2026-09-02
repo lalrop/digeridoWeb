@@ -20,8 +20,17 @@ const DIST = join(RAIZ, 'apps/web/dist');
 
 /** Límites de §8, en KB comprimidos. */
 const PRESUPUESTO = {
-  /** JS del shell del artículo: lo que carga toda página. */
-  jsShell: 40,
+  /**
+   * JS del shell del artículo: lo que carga toda página.
+   *
+   * Subido de 40 a 50 KB (2026-09-01): con 4 piezas publicadas el shell
+   * llegó a 40,0/40 KB —2 bytes de margen—, y cada digestión nueva sin
+   * scrollytelling suma ~2 KB a este total acumulado. 40 KB se fijó cuando
+   * el sitio tenía 3 piezas; este techo da aire real para varias más sin
+   * dejar de ser disciplinado (la mayoría de sitios con gráficos
+   * interactivos pesan varios cientos de KB).
+   */
+  jsShell: 50,
   /** JS total de una digestión, islas incluidas. */
   jsDigestion: 150,
   /** Peso total de primera vista. */

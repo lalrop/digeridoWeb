@@ -14,6 +14,4 @@ export {
   necesitaFilete, grafico, MAX_CATEGORICA,
 } from './escalas.js';
 
-export { enVista } from './interaccion.js';
-
-export { observarAncho } from './redimension.js';
+export { enVista, observarAncho } from './interaccion.js';
