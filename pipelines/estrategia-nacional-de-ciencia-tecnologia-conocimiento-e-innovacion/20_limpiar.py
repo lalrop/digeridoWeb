@@ -40,7 +40,9 @@ def main() -> int:
     ]
 
     problemas: list[str] = []
-    problemas += sin_nulos_en(limpias, ["region", "universidades", "investigadores", "doctoradosPor1000"])
+    problemas += sin_nulos_en(
+        limpias, ["region", "universidades", "investigadores", "doctoradosPor1000"]
+    )
     problemas += sin_duplicados_en(limpias, ["region"])
     problemas += en_rango(limpias, "universidades", 0, 100)
     problemas += en_rango(limpias, "investigadores", 0, 50_000)

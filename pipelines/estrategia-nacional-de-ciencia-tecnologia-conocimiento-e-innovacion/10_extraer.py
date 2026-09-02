@@ -38,13 +38,17 @@ PDF = CRUDO / "ENCTCI26.pdf"
 # propia infografía (p.113): universidades, investigadores, y personas con
 # doctorado trabajando cada 1.000 trabajadores.
 CAPACIDADES_POR_REGION = [
-    {"region": "Arica y Parinacota", "universidades": 4, "investigadores": 234, "doctoradosPor1000": "1,5"},
+    {"region": "Arica y Parinacota", "universidades": 4, "investigadores": 234,
+     "doctoradosPor1000": "1,5"},
     {"region": "Tarapacá", "universidades": 4, "investigadores": 99, "doctoradosPor1000": "0,6"},
-    {"region": "Antofagasta", "universidades": 6, "investigadores": 256, "doctoradosPor1000": "1,3"},
+    {"region": "Antofagasta", "universidades": 6, "investigadores": 256,
+     "doctoradosPor1000": "1,3"},
     {"region": "Atacama", "universidades": 4, "investigadores": 40, "doctoradosPor1000": "0,7"},
     {"region": "Coquimbo", "universidades": 7, "investigadores": 137, "doctoradosPor1000": "0,9"},
-    {"region": "Valparaíso", "universidades": 12, "investigadores": 925, "doctoradosPor1000": "2,5"},
-    {"region": "Metropolitana", "universidades": 28, "investigadores": 6139, "doctoradosPor1000": "2,6"},
+    {"region": "Valparaíso", "universidades": 12, "investigadores": 925,
+     "doctoradosPor1000": "2,5"},
+    {"region": "Metropolitana", "universidades": 28, "investigadores": 6139,
+     "doctoradosPor1000": "2,6"},
     {"region": "O'Higgins", "universidades": 5, "investigadores": 266, "doctoradosPor1000": "0,3"},
     {"region": "Maule", "universidades": 7, "investigadores": 301, "doctoradosPor1000": "1,5"},
     {"region": "Ñuble", "universidades": 3, "investigadores": 149, "doctoradosPor1000": "1,6"},
@@ -69,7 +73,10 @@ def main() -> int:
         json.dumps(CAPACIDADES_POR_REGION, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
 
-    log.info("transcritas %d regiones (ver comentario de origen en este script)", len(CAPACIDADES_POR_REGION))
+    log.info(
+        "transcritas %d regiones (ver comentario de origen en este script)",
+        len(CAPACIDADES_POR_REGION),
+    )
 
     texto = extraer_texto()
     leg = legibilidad(texto)

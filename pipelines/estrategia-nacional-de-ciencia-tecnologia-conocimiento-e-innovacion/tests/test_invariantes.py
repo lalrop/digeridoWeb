@@ -40,7 +40,9 @@ def test_declara_unidad(datos: dict) -> None:
 
 def test_llaves_completas(datos: dict) -> None:
     reportar(
-        sin_nulos_en(datos["filas"], ["region", "universidades", "investigadores", "doctoradosPor1000"]),
+        sin_nulos_en(
+            datos["filas"], ["region", "universidades", "investigadores", "doctoradosPor1000"]
+        ),
         "datos.json",
     )
 
