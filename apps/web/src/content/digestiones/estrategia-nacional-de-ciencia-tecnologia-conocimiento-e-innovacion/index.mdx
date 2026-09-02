@@ -1,0 +1,107 @@
+---
+titulo: 'Estrategia Nacional de Ciencia, Tecnología, Conocimiento e Innovación 2026'
+# Máximo 220 caracteres. Lo que se lee bajo el título y en los metadatos.
+bajada: 'La Estrategia Nacional de CTCI 2026 fija las prioridades de ciencia e innovación de Chile. Su único dato regional muestra que la capital concentra investigadores, pero no la mayor proporción de doctorados trabajando.'
+# LA FRASE ÚNICA. Una sola oración, sin jerga. Si no existe, no se publica (§2).
+# El esquema rechaza más de un punto final y más de 180 caracteres.
+hallazgo: '6 de cada 10 investigadores de Chile trabajan en la Región Metropolitana, pero la que más doctorados tiene por cada 1.000 trabajadores no es la capital: es Los Ríos.'
+fecha: 2026-09-02
+autores: ['digerido']
+# presupuesto · economia · salud · educacion · medioambiente · legislativo ·
+# compras-publicas · territorio
+temas: ['territorio']
+# 1 = legible, 5 = ilegible. Alimenta la etiqueta nutricional.
+# legibilidadOriginal 40/100 = "difícil" en la escala Fernández-Huerta, con 439
+# siglas sin definir en 280 páginas — el documento más grande digerido hasta ahora.
+dificultadOriginal: 5
+# Minutos. El esquema exige que el digerido sea MENOR que el original.
+tiempoLectura:
+  original: 464
+  # Medido con tiempoLectura() sobre el texto final del artículo (551 palabras).
+  digerido: 3
+# Las escribe el pipeline (30_publicar.py) y se copian de pipelines/.../meta.json.
+# No las estimes a mano: es así como se cuela un error factual (§13).
+etiqueta:
+  palabrasOriginal: 92886
+  siglasSinDefinir: 439
+  legibilidadOriginal: 40
+  # Medido con legibilidad() sobre el texto final del artículo: 54/100, "bastante difícil".
+  legibilidadDigerido: 54
+  graficos: 2
+# Sin fuente verificable el build falla. El sha256 lo registra 00_descargar.py.
+fuentes:
+  - titulo: 'Estrategia Nacional de Ciencia, Tecnología, Conocimiento e Innovación para el Desarrollo de Chile 2026'
+    organismo: 'Consejo Nacional de CTCI'
+    url: 'https://estrategia.consejoctci.cl'
+    # No es una fecha de portada del documento (no trae una): es la fecha de
+    # creación del PDF según sus metadatos (Adobe InDesign). El propio Consejo
+    # solo cita el año "2026" en su formato de referencia bibliográfica.
+    fechaPublicacion: 2026-05-25
+    fechaDescarga: 2026-09-01
+    sha256: '2dc66efc727cad7a28681ab012b035092410d4052eea28a082af3922417b49e9'
+    paginas: 280
+    formato: 'pdf'
+# Publicados en /datos/ con licencia. Los produce 30_publicar.py.
+datasets:
+  - nombre: 'Capacidades de CTCI por región: universidades, investigadores y doctorados/1.000 trabajadores'
+    archivo: 'estrategia-nacional-de-ciencia-tecnologia-conocimiento-e-innovacion/datos.json'
+    licencia: 'CC BY 4.0'
+    descripcion: 'Universidades, investigadores y personas con doctorado trabajando por cada 1.000 trabajadores, por región. Estimaciones del Consejo CTCI en base a información administrativa de ANID y de la Gerencia de Capacidades Tecnológicas de CORFO, transcritas a mano desde la infografía de las páginas 112-113 del documento original.'
+    filas: 16
+    bytes: 1434
+destacada: false
+# 'borrador' hasta que pase el checklist de §10. 'publicada' exige etiqueta
+# completa y al menos una limitación declarada.
+estado: 'publicada'
+# Qué NO dice esta digestión. Obligatorio antes de publicar (§10).
+limitaciones:
+  - 'Esta pieza digiere un solo dato concreto —el mapa de capacidades CTCI por región— de un documento de 280 páginas dedicado, sobre todo, a fijar la visión, los objetivos y las iniciativas estratégicas del país en ciencia e innovación para los próximos años. No resume esa estrategia completa.'
+  - 'Los 16 valores por región se transcribieron a mano desde una infografía (páginas 112-113 del PDF): el documento no trae esos datos como tabla de texto, y una extracción automática los devuelve desordenados (nombres de región invertidos, números fuera de orden). Se verificaron dos veces contra la imagen original.'
+  - 'El propio documento aclara que esta cifra es una "estimación en base a información administrativa de ANID y de la Gerencia de Capacidades Tecnológicas de CORFO", no un censo exacto y verificado independientemente.'
+  - 'La URL que el documento declara como su versión digital no resolvió al verificar la fuente para esta pieza (05-09/2026); es posible que el sitio del Consejo CTCI todavía no esté completamente publicado. El hash registrado corresponde al archivo proporcionado, no a una descarga confirmada en línea.'
+  - 'Es una fotografía de un momento: el documento no incluye una serie histórica que permita saber si esta distribución regional viene cambiando o se mantiene estable en el tiempo.'
+# Log de correcciones público, con fecha (§13). No se edita en silencio.
+correcciones: []
+---
+
+import ConcentracionInvestigadores from './components/ConcentracionInvestigadores.svelte';
+import DoctoradosPorRegion from './components/DoctoradosPorRegion.svelte';
+import datos from '../../../../public/data/estrategia-nacional-de-ciencia-tecnologia-conocimiento-e-innovacion/datos.json';
+
+## El plato de entrada
+
+Si la ciencia chilena fuera un mapa de calor, Santiago se vería como una hoguera y el resto del país como brasas dispersas: 6 de cada 10 investigadores del país trabajan en la Región Metropolitana. Pero hay una cifra que no sigue ese mismo mapa. La región con más personas con doctorado trabajando por cada 1.000 trabajadores no es la capital — es Los Ríos, una región que reúne apenas el 2,2% de la población de Chile (Censo 2024, INE).
+
+{/* El gráfico principal va a ancho de figura, no de texto. */}
+<div class="carril-ancho">
+  <ConcentracionInvestigadores datos={datos.filas} client:visible />
+</div>
+
+## La materia prima
+
+La Estrategia Nacional de Ciencia, Tecnología, Conocimiento e Innovación (CTCI) para el Desarrollo de Chile 2026 la redactó el Consejo CTCI, un organismo asesor de la Presidencia de la República. Tiene 280 páginas y, según nuestra medición, es "difícil" de leer (40 sobre 100 en la escala Fernández-Huerta): usa 439 siglas distintas sin definir la primera vez que aparecen —EBCT, OTL, CFT, ITIP, entre decenas más—. Leerla completa tomaría, a un ritmo normal, unas **7 horas y 44 minutos**: casi una jornada laboral entera dedicada solo a este documento.
+
+## El plato de fondo
+
+Es como comparar el tamaño de una tienda con la calidad de lo que vende: Santiago es, por lejos, la tienda más grande —28 universidades, 6.139 investigadores—, pero eso no la convierte automáticamente en la de mayor concentración de talento avanzado por persona empleada. Esa medida —doctorados trabajando por cada 1.000 trabajadores— la lidera Los Ríos, seguida de Biobío y recién en tercer lugar la Región Metropolitana.
+
+{/* Gráfico de apoyo: doctorados por cada 1.000 trabajadores, por región. */}
+<div class="carril-ancho">
+  <DoctoradosPorRegion datos={datos.filas} client:visible />
+</div>
+
+La brecha entre el primer lugar (Los Ríos, 4,3) y el último (O'Higgins, 0,3) es de 14 veces — la diferencia más grande de todo el mapa regional del documento.
+
+## Los aperitivos
+
+**Los Ríos no es un caso aislado.** Detrás de Los Ríos y Biobío en la tabla de doctorados por trabajador viene la Región Metropolitana: el sur de Chile ocupa dos de los tres primeros lugares en esta medida específica, algo que no ocurre en investigadores totales ni en universidades, donde Santiago domina sin competencia.
+
+**Lo que cuenta como "ciencia" en este mapa también varía por región.** El documento agrupa bajo la sigla EBCT (Empresa de Base Científica Tecnológica, una compañía que nace directamente de investigación universitaria) a este tipo de negocios: Santiago tiene 105; la región que le sigue, Biobío, tiene 42, menos de la mitad.
+
+**La cifra que no está.** El documento no dice cuántos de esos investigadores nacieron en la región donde trabajan hoy, ni cuántos llegaron desde otra parte del país o del extranjero — un dato que ayudaría a entender si esta distribución refleja arraigo o solo oferta de empleo.
+
+## El postre
+
+El mapa de esta pieza toca algo que la propia Estrategia reconoce desde dos ángulos distintos: identifica la falta de apropiación social de la CTCI como uno de sus "nudos críticos", y su consulta ciudadana 2025 encontró, por separado, una "preocupación persistente por la desigualdad territorial en el acceso a capacidades" científicas y tecnológicas. La respuesta no es simple. Una región puede tener pocos investigadores en total y aun así una alta densidad de doctorados trabajando —como Los Ríos—, lo que sugiere que el tamaño de una región no determina por sí solo qué tan intensiva en conocimiento es su fuerza laboral. Lo que el documento no explica es *por qué* pasa esto en Los Ríos y no, por ejemplo, en O'Higgins: haría falta cruzar estos datos con la composición productiva de cada región para saberlo.
+
+Cómo se construyeron estos datos, con el hash y la fecha de descarga del documento original, está en [Método](/metodo/).

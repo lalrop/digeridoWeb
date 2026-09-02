@@ -1,0 +1,42 @@
+{
+  "slug": "estrategia-nacional-de-ciencia-tecnologia-conocimiento-e-innovacion",
+  "generado": "2026-09-02",
+  "fuente": {
+    "url": "https://estrategia.consejoctci.cl",
+    "ruta": "C:\\Users\\lrodr\\Desarrollos\\Digerido\\pipelines\\estrategia-nacional-de-ciencia-tecnologia-conocimiento-e-innovacion\\raw\\ENCTCI26.pdf",
+    "sha256": "2dc66efc727cad7a28681ab012b035092410d4052eea28a082af3922417b49e9",
+    "bytes": 41700379,
+    "fecha_descarga": "2026-09-02T01:14:20.315982+00:00",
+    "desde_cache": true
+  },
+  "etiqueta": {
+    "palabrasOriginal": 92886,
+    "siglasSinDefinir": 439,
+    "legibilidadOriginal": 40,
+    "nivelOriginal": "difícil",
+    "tiempoLecturaOriginal": 464,
+    "detalle": {
+      "indice": 40,
+      "nivel": "difícil",
+      "palabras": 92886,
+      "frases": 3825,
+      "silabas": 219328,
+      "silabasPorPalabra": 2.361,
+      "palabrasPorFrase": 24.28
+    }
+  },
+  "artefactos": [
+    {
+      "archivo": "estrategia-nacional-de-ciencia-tecnologia-conocimiento-e-innovacion/datos.json",
+      "bytes": 1477,
+      "filas": 16,
+      "sha256": "d2ba81472e8b1bcbea8ff97a95c6c731d2f2250a564f3fefed56f9d5ad4823cb"
+    },
+    {
+      "archivo": "estrategia-nacional-de-ciencia-tecnologia-conocimiento-e-innovacion/datos.csv",
+      "bytes": 378,
+      "filas": 16,
+      "sha256": "5367c81928148212a9e6fc322a80d8d720b81b9d4e6b01c8c1f0a2175dbf6bed"
+    }
+  ]
+}

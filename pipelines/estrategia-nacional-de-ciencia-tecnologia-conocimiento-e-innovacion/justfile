@@ -1,0 +1,50 @@
+# Pipeline de la digestión `estrategia-nacional-de-ciencia-tecnologia-conocimiento-e-innovacion`.
+#
+# Correr desde la raíz:  just -f pipelines/estrategia-nacional-de-ciencia-tecnologia-conocimiento-e-innovacion/justfile todo
+
+raiz := justfile_directory() / "../.."
+py := "python3"
+
+default:
+    @just --list --unsorted -f "{{ justfile() }}"
+
+# Pipeline completo: descargar → extraer → limpiar → validar → publicar.
+todo: descargar extraer limpiar test publicar
+    @echo "listo. Actualizá el frontmatter con las métricas del meta.json."
+    @echo "próximo paso: just -f pipelines/estrategia-nacional-de-ciencia-tecnologia-conocimiento-e-innovacion/justfile redactar"
+
+descargar *args:
+    cd "{{ raiz }}" && {{ py }} -m pipelines.estrategia-nacional-de-ciencia-tecnologia-conocimiento-e-innovacion.00_descargar {{ args }}
+
+extraer:
+    cd "{{ raiz }}" && {{ py }} -m pipelines.estrategia-nacional-de-ciencia-tecnologia-conocimiento-e-innovacion.10_extraer
+
+limpiar:
+    cd "{{ raiz }}" && {{ py }} -m pipelines.estrategia-nacional-de-ciencia-tecnologia-conocimiento-e-innovacion.20_limpiar
+
+publicar:
+    cd "{{ raiz }}" && {{ py }} -m pipelines.estrategia-nacional-de-ciencia-tecnologia-conocimiento-e-innovacion.30_publicar
+
+# Bloquean la publicación.
+test:
+    cd "{{ raiz }}" && {{ py }} -m pytest pipelines/estrategia-nacional-de-ciencia-tecnologia-conocimiento-e-innovacion/tests -q
+
+# Revalida el hash de la fuente contra el registrado (§13).
+revalidar:
+    cd "{{ raiz }}" && {{ py }} -m pipelines.estrategia-nacional-de-ciencia-tecnologia-conocimiento-e-innovacion.00_descargar --forzar
+
+# Paso final (asistido) — propuesta de artículo con el agente redactor-digestion.
+# No es un script: el agente vive en .claude/agents/ y solo corre dentro de una
+# sesión de Claude Code (no tiene forma de invocarse desde una terminal sola).
+redactar:
+    @echo "Este paso no corre solo: abrí una sesión de Claude Code en la raíz del repo y pedile"
+    @echo ""
+    @echo "  Usa el agente redactor-digestion para el slug estrategia-nacional-de-ciencia-tecnologia-conocimiento-e-innovacion"
+    @echo ""
+    @echo "El agente lee raw/ e interim/ de esta digestión, y te muestra 3 opciones de cada"
+    @echo "sección narrativa en PROPUESTA-ARTICULO.md para que elijas antes de que escriba"
+    @echo "el index.mdx definitivo."
+
+# Borra intermedios, conserva las descargas crudas.
+limpiar-cache:
+    rm -rf "{{ justfile_directory() }}/interim"

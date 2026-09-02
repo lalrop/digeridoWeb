@@ -66,6 +66,39 @@ export function colorDivergente(valor: number, maxAbsoluto: number): string {
 }
 
 /**
+ * Color continuo de la rampa secuencial para un valor entre `min` y `max`.
+ *
+ * A diferencia de `escalaSecuencial(n)` (que corta la rampa en N escalones
+ * por posición/orden), esto interpola linealmente el color exacto según
+ * dónde cae el valor en su rango — lo correcto para un mapa de calor, donde
+ * el valor en sí (no su ranking) es lo que se está codificando. Sin nueva
+ * dependencia: interpola a mano entre los dos tramos de `grafico.secuencial`
+ * más cercanos (d3-interpolate ya viaja empaquetado dentro de d3-scale, pero
+ * traerlo como dependencia directa solo para esto no valía la pena).
+ */
+export function colorSecuencial(valor: number, min: number, max: number): string {
+  const rampa = grafico.secuencial;
+  if (max <= min || !Number.isFinite(valor)) return rampa[0]!;
+  const t = Math.max(0, Math.min(1, (valor - min) / (max - min)));
+  const posicion = t * (rampa.length - 1);
+  const i = Math.min(rampa.length - 2, Math.floor(posicion));
+  return mezclarHex(rampa[i]!, rampa[i + 1]!, posicion - i);
+}
+
+function hexARgb(hex: string): { r: number; g: number; b: number } {
+  const n = Number.parseInt(hex.slice(1), 16);
+  return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+}
+
+function mezclarHex(desde: string, hasta: string, t: number): string {
+  const a = hexARgb(desde);
+  const b = hexARgb(hasta);
+  const canal = (x: number, y: number) => Math.round(x + (y - x) * t);
+  const hex2 = (v: number) => v.toString(16).padStart(2, '0');
+  return `#${hex2(canal(a.r, b.r))}${hex2(canal(a.g, b.g))}${hex2(canal(a.b, b.b))}`;
+}
+
+/**
  * ¿Necesita filete esta marca? Los pasos claros de la secuencial y la
  * divergente casi desaparecen sobre el papel (§5).
  */
